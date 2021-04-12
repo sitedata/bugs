@@ -137,7 +137,12 @@ code{
   background-color: #46a546;
 }
 .label.notice {
-  background-color: #62cffc;
+	color: blue;
+	background-color: #62cffc;
+}
+.label.reproject {
+	color: black;
+	background-color: #fcfd52;
 }
 .label.info {
   background-color: #5f6074;
@@ -208,7 +213,7 @@ textarea, input[type=text], input[type=password]{
 	box-shadow: 0 -1px 1px #b6b6b6;
 }
 .action,
-input[type=submit]{
+input[type=submit], input.button2 {
 	font: bold 13px Helvetica, "Lucida Grande", Arial, sans-serif;
 	color: #fff;
 	padding: 10px 13px;
@@ -216,19 +221,29 @@ input[type=submit]{
 	border-radius: 6px;
 	background: #138dc1;
 }
+input[type=submit]{
+	background: #138dc1;
+}
 .action:hover,
 .action:focus,
 input[type=submit]:hover,
-input[type=submit]:focus{
+input.button2:hover,
+input[type=submit]:focus,
+input.button2:focus{
 	cursor: pointer;
 	background: #424242;
 	border: 1px solid #262626;
 	color: white;
 }
+input.button2{
+	background: #034d91;
+}
 
 p{
 	margin-bottom: 10px;
 	line-height: 17px;
+	color: #434343;
+	font-size: 120%;
 }
 .form th{
 	font-weight: bold;
@@ -714,6 +729,25 @@ div.stat_form {
 	color: #535353;
 }
 
+.Appliquer{
+	margin: 7px;
+	width: 26px; height: 26px;
+	display: block;
+	float: left;
+}
+.Appliquer, .AppliquerB, .AppliquerT{
+	background: url('../images/layout/icon-ri-arrow.png') no-repeat;
+}
+
+.AppliquerB{
+	background: url('../images/layout/icon-bi-arrow.png') no-repeat;
+}
+
+.AppliquerT{
+	background: url('../images/layout/icon-ti-arrow.png') no-repeat;
+}
+
+
 #add-user-project{
 	margin: 0 auto;
 	display: block;
@@ -723,6 +757,21 @@ div.stat_form {
 	border: 0;
 	font: normal 12px Helvetica, "Lucida Grande", Arial, sans-serif;
 	box-shadow: 0 0 0;
+}
+th.project-user {
+	background-color: #EEEEEE;
+}
+td.project-user, th.project-user {
+	border-bottom-style: solid; 
+	border-bottom-width: 2px; 
+	border-bottom-color: #dfdfdf; 
+}
+	
+#projetProsedNamesPage {
+	width: 50%; 
+	text-align: left; 
+	margin-left: 0; 
+	padding: 1px 1px 15px 1px;
 }
 /* Content */
 #content{
@@ -801,8 +850,9 @@ div.stat_form {
 .blue-box .activity li .label{
 	float: left;
 	margin-top: 2px;
-	width: 68px;
+	min-width: 68px;
 	text-align: center;
+	margin-right: 5px;
 }
 .blue-box .activity li .tag-activity
 {
@@ -1199,6 +1249,7 @@ ul.isssues li {
   border: 2px solid #D4EFFF;
 }
 
+
 #lane-status-0 {
   float: right; 
   margin-right: 0;
@@ -1242,6 +1293,9 @@ ul.isssues li {
 .todo-state-hover {
   border: 2px solid orange;
 }
+/*
+//Patrick, 7 février 2021
+//Nous devons nous débarasser de ces références à des outils désuets
 /* UPLOADIFY CUSTOM BUTTON */
 .upload-wrap{
 	position: relative;
@@ -1333,7 +1387,11 @@ div.Projet:hover {
 }
 div.Closed:hover, div.Closed:hover > a {
 	background-color: #333; 
-	color: gray;
+	color: white;
+} 
+div.ResuRechComment:hover, div.ResuRechComment:hover > a {
+	background-color: #003; 
+	color: white;
 } 
 
 input.inputRech {

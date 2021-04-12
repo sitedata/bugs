@@ -3,7 +3,7 @@
 class Project_Issue_Controller extends Base_Controller {
 
 	public $layout = 'layouts.project';
-
+	
 	public function __construct() {
 		parent::__construct();
 
@@ -55,6 +55,7 @@ class Project_Issue_Controller extends Base_Controller {
 		$project = \Project::find($project_id);
 		
 		//Email process
+			$header = "";
 			$subject  = sprintf(__('email.assignment'),$Issue_title,$project_nm);
 			$text  = sprintf(__('email.assignment'),$Issue_title,$project_nm);
 			$text .= "\n\n";
@@ -63,7 +64,7 @@ class Project_Issue_Controller extends Base_Controller {
 			$text .= sprintf(__('tinyissue.priority')." : ".__('tinyissue.priority_desc_'.$thisIssue[0]->attributes["status"]));
 			$text .= "\n\n";
 			$text .= __('email.more_url').Project::current()->to('issue')."/".$issue_num."";
-			mail($WhoAddr, $subject,$text);
+			mail($WhoAddr, $subject,$text,$header);
 		//End of email process
 
 		return Redirect::to($issue['issue']->to())
@@ -71,7 +72,7 @@ class Project_Issue_Controller extends Base_Controller {
 	}
 
 	/**
-	 * View a issue
+	 * View an issue
 	 * /project/(:num)/issue/(:num)
 	 *
 	 * @return View
@@ -90,7 +91,7 @@ class Project_Issue_Controller extends Base_Controller {
 	}
 
 	/**
-	 * Post a comment to a issue
+	 * Post a comment to an issue
 	 *
 	 * @return Redirect
 	 */
@@ -101,30 +102,50 @@ class Project_Issue_Controller extends Base_Controller {
 		}
 		$comment = \Project\Issue\Comment::create_comment(Input::all(), Project::current(), Project\Issue::current());
 		return Redirect::to(Project\Issue::current()->to() . '#comment' . $comment->id)
-			->with('notice', __('tinyissue.your_comment_added'));
+			->with('notice', __('tinyissue.your_comment_added'.((Input::get('status') == 0 || Input::get('Fermons') == 0) ? ' --- '.__('tinyissue.issue_has_been_closed') : '')));
 	}
 
 	/**
-	 * Edit a issue
+	 * Edit an issue
 	 *
 	 * @return View
 	 */
 	public function get_edit() {
-		Asset::add('tag-it-js', '/app/assets/js/tag-it.min.js', array('jquery', 'jquery-ui'));
-		Asset::add('tag-it-css-base', '/app/assets/css/jquery.tagit.css');
-		Asset::add('tag-it-css-zendesk', '/app/assets/css/tagit.ui-zendesk.css');
+		if (@$_GET["ticketAct"] == 'changeProject') {
+			//Change the asssociation between this issue and its related project
+			$msg = 0;
+			$NumNew = intval(Input::get('projectNew'));
+			$NumNewResp = intval(Input::get('projectNewResp'));
+			if ($NumNewResp == 0) {
+				$resu  = \DB::table('projects')->select(array('default_assignee'))->where('id', '=', $NumNew)->get();
+				$NumResp = $resu[0]; 
+			}
 
-		/* Get tags as string */
-		$issue_tags = '';
-		foreach(Project\Issue::current()->tags as $tag) {
-			$issue_tags .= (!empty($issue_tags) ? ',' : '') . $tag->tag;
+			$result  = __('tinyissue.edit_issue')." : ";
+			$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => 'Ce billet a été changé de projet, passant de '.Input::get('projetOld').' à '.$NumNew.' ( confié à '.$NumNewResp.') par l`action de '.\Auth::user()->id.'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
+			$result .= ($Modif) ? "Succès" : "Échec";
+			$Modif = Project\Issue::where('project_id', '=', intval(Input::get('projetOld')))->where('id', '=', intval(Input::get('ticketNum')))->update(array('project_id' => $NumNew, 'assigned_to' => $NumNewResp, 'updated_at' => date("Y-m-d H:i:s"), 'updated_by' => \Auth::user()->id));
+			$result .= ($Modif) ? "Succès" : "Échec";
+			if (\User\Activity::add(8, intval(Input::get('projetOld')), Input::get('ticketNum'), $NumNew, "From ".Input::get('projetOld')." to ".$NumNew )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
+
+			return Redirect::to("project/".$NumNew."/issues?tag_id=1");
+
+		} else {
+			Asset::add('tag-it-js', '/app/assets/js/tag-it.min.js', array('jquery', 'jquery-ui'));
+			Asset::add('tag-it-css-base', '/app/assets/css/jquery.tagit.css');
+			Asset::add('tag-it-css-zendesk', '/app/assets/css/tagit.ui-zendesk.css');
+	
+			/* Get tags as string */
+			$issue_tags = '';
+			foreach(Project\Issue::current()->tags as $tag) {
+				$issue_tags .= (!empty($issue_tags) ? ',' : '') . $tag->tag;
+			}
+			return $this->layout->nest('content', 'project.issue.edit', array(
+				'issue' => Project\Issue::current(),
+				'issue_tags' => $issue_tags,
+				'project' => Project::current()
+			));
 		}
-
-		return $this->layout->nest('content', 'project.issue.edit', array(
-			'issue' => Project\Issue::current(),
-			'issue_tags' => $issue_tags,
-			'project' => Project::current()
-		));
 	}
 
 	public function post_edit() {
@@ -150,11 +171,8 @@ class Project_Issue_Controller extends Base_Controller {
 	 */
 	public function post_edit_comment() {
 		if(Input::get('body')) {
-			$comment = Project\Issue\Comment::find(str_replace('comment', '', Input::get('id')))
-					->fill(array('comment' => str_replace("'", "`", Input::get('body'))))
-					->save();
-
-			return Project\Issue\Comment::format(Input::get('body'));
+			$comment = \Project\Issue\Comment::edit_comment(str_replace('comment', '', Input::get('id')), str_replace("'", "`", Input::get('body')));
+			return true;
 		}
 	}
 
@@ -192,6 +210,9 @@ class Project_Issue_Controller extends Base_Controller {
 			->with('notice', $message);
 	}
 
+	/**
+		*Show the issue's tags
+	**/
 
 	private function show_tag ($Content) {
 		$result = "
@@ -366,15 +387,17 @@ class Project_Issue_Controller extends Base_Controller {
 		$now = date("Y-m-d H:i:s");
 		$Issue = Project\Issue::current()->id;
 		$Project = Project::current()->id;
+		$rep = (substr($pref["directory"], 0, 1) == '/') ? $pref["directory"] : "../".$pref["directory"];
+
 		//Common data for the insertion into database: file's type, date, ect
 		if ($Issue == 1) {		
-			//Attach a file to a new issue 
-			////We give it the next available issue number
-			$NxIssue = \DB::table('projects_issues')->order_by('id','DESC')->get();
-			$Issue = $NxIssue[0]->id + 1;
-			////We give it the next available issue comment number
-			$Quel = \DB::table('projects_issues_comments')->order_by('id','DESC')->get();
-			$idComment = $Quel[0]->id + 1;
+			//Attach a file to a new issue
+			////We'll keep uploaded files in uploads/New/date directory until the issue will be created 
+			$Issue = 'New/'.$Qui;
+			$idComment = date("Ymd");
+			if (!file_exists($rep."New")) {
+				if (mkdir ($rep."New", 0775)) { $msg = $msg + 1; }
+			}
 		} else {
 			//Attach a file to an existing issue
 			$Quel = \DB::table('projects_issues_comments')->where('issue_id', '=', $Issue)->order_by('id','DESC')->get();
@@ -382,9 +405,8 @@ class Project_Issue_Controller extends Base_Controller {
 		}
 
 		//Preparing the name and directories' names according to user preferences
-		///First: preparing the directories
+		///First step: preparing the directories
 		$TheFile	= $_FILES["Loading"];
-		$rep = (substr($pref["directory"], 0, 1) == '/') ? $pref["directory"] : "../".$pref["directory"];
 		if($pref["method"] == 'i') {
 			if (!file_exists($rep."/".$Issue."/".$idComment)) {
 				if (!file_exists($rep.$Issue)) {
@@ -394,7 +416,7 @@ class Project_Issue_Controller extends Base_Controller {
 			$rep = $rep.$Issue."/";
 		}
 
-		////Second: setting the file's name
+		////Second step: setting the file's name
 		$fileName = (($pref["method"] == 'i') ? "" : $Issue."_").$idComment."_".$_GET["Nom"];	//Default value  ( 'ICN' )
 		switch ($pref["format"]) {
 			case "NCI":
@@ -405,6 +427,7 @@ class Project_Issue_Controller extends Base_Controller {
 				break;
 		}
 
+		//Third step: process the file
 		if(move_uploaded_file($TheFile["tmp_name"], $rep.$fileName)) {
 			$msg = $msg + 1;
 			//Make sure the file will be openable to all users, not only the php engine
@@ -415,16 +438,20 @@ class Project_Issue_Controller extends Base_Controller {
 			////775 = Everything for owner and group, read and execute for strangers
 			////776 = Everything for owner and group, read and write for strangers
 			if (chmod($rep.$fileName, "0775")) { $msg = $msg + 1; }
-
-			//Keep track into the database
+		} else {
+			return 0;
+		}
+		//Forth step: Store it into database
+		if ($Issue != 'New/'.$Qui) {		
 			//Modifié le 23 juin 2019, retrait des  "../" imposés dans l'enregistrement de l'adresse
 			\DB::table('projects_issues_attachments')->insert(array('id'=>NULL,'issue_id'=>$Issue,'comment_id'=>$idComment,'uploaded_by'=>$Qui,'filesize'=>$TheFile["size"],'filename'=>str_replace("../", "", $rep).$fileName,'fileextension'=>$_GET["ext"],'upload_token'=>$TheFile["tmp_name"],'created_at'=>$now,'updated_at'=>$now) );
 			$Quel = \DB::table('projects_issues_attachments')->where('issue_id', '=', $Issue)->order_by('id','DESC')->get();
 			if (\User\Activity::add(7, $Project, $Issue, $Quel[0]->id, $fileName )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
-		} else {
-			return 0;
 		}
+		
+		//Fifth: Show on user's desk
 		if (is_numeric($msg)) {
+			$rep = (substr($rep, 0, 3) == '../') ? substr($rep, 3) : $rep;
 			$msg .= ';';
 			$msg .= '<div class="insides"><div class="topbar"><div class="data">';
 			$msg .= '<span style="font-weight: bold; color: #090;">'.__('tinyissue.fileuploaded').'</span>';

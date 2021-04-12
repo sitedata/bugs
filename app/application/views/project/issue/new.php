@@ -1,4 +1,21 @@
-<?php $config_app = require path('public') . 'config.app.php'; ?>
+<?php 
+	if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id) || Auth::user()->role_id == 1) {
+		echo '<script>document.location.href="'.URL::to().'";</script>';
+	}
+
+$config_app = require path('public') . 'config.app.php';
+$url =\URL::home();
+
+//Clean the sub-directory from previously uploaded files - if ever the previous ticket creation aborted
+$chemin = $url."uploads/New/".\Auth::user()->id;
+if (file_exists($chemin)) {
+	$chemin .= "/"; 
+	$attacheds = scandir($chemin);
+	foreach ($attacheds as $filename) {
+		if (!in_array($filename , array(".", ".."))) { unlink($chemin.$filename); } 
+	}
+}
+?>
 <h3>
 	<?php echo __('tinyissue.create_a_new_issue'); ?>
 	<span><?php echo __('tinyissue.create_a_new_issue_in'); ?> <a href="<?php echo $project->to(); ?>"><?php echo $project->name; ?></a></span>
@@ -6,7 +23,7 @@
 
 <div class="pad">
 
-	<form method="post" action="">
+	<form method="post" action="" enctype="multipart/form-data">
 
 		<table class="form" style="width: 100%;">
 			<tr>
@@ -118,31 +135,40 @@ function IMGupload(input) {
 	var IDcomment = 'comment' + new Date().getTime();
 	var fil = document.getElementById("file_upload").files[0];
 	var ext = fil['name'].substring(fil['name'].lastIndexOf('.') + 1).toLowerCase();
+	var img = "app/assets/images/icons/file_01.png?"; 
+	var formdata = new FormData();
 	var formdata = new FormData();
 	formdata.append("Loading", fil);
+	if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg") { 
+		img = "uploads/New/<?php echo \Auth::user()->id.'/'.date("Ymd").'_'; ?>" + fil['name'];
+	} else if (xhttpCHK.responseText == 'yes' ) {
+		img = "app/assets/images/upload_type/" + ext + ".png";
+	}
 	var xhttpUPLD = new XMLHttpRequest();
-	var NextPage = '<?php echo substr($_SERVER['REQUEST_URI'], 0, strlen($_SERVER['REQUEST_URI'])-4); ?>/1/upload?Nom=' + fil['name'] + '&Who=' + <?php echo \Auth::user()->id; ?> + '&ext=' + ext;
+	//var NextPage = '<?php echo substr($_SERVER['REQUEST_URI'], 0, strlen($_SERVER['REQUEST_URI'])-4); ?>/1/upload?Nom=' + fil['name'] + '&Who=' + <?php echo \Auth::user()->id; ?> + '&ext=' + ext;
+	var NextPage = '<?php echo substr($_SERVER['REQUEST_URI'], 0, strlen($_SERVER['REQUEST_URI'])-3); ?>1/upload?Nom=' + fil['name'];
+	NextPage = NextPage + '&ext=' + ext;
+	NextPage = NextPage + '&fileName=' + fil['name'];
+	NextPage = NextPage + '&icone=' + img;
+
 	xhttpUPLD.onreadystatechange = function() {
 		if (this.readyState == 3 ) {
 			document.getElementById('div_barupload').style.display = "block";
 		}
 		if (this.readyState == 4 && this.status == 200) {
 			var adLi = document.createElement("LI");
-			var img = "../../../../app/assets/images/icons/file_01.png?"; 
 			adLi.className = 'comment';
 			adLi.id = IDcomment;
 			document.getElementById('ul_IssueDiscussion').appendChild(adLi);
-			if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg") { 
-				var img = "../../../../uploads/" + fil['name'];
-			}
 			var msg = '<div class="insides"><div class="topbar"><div class="data">';
-			msg = msg + '<a href="../../../../uploads/' + fil['name'] + "?" + new Date().getTime() + '" target="_blank" />';
-			msg = msg + '<img src="' + img + '" height="30" align="right" border="0" />';
+			msg = msg + '<a href="<?php echo $url; ?>uploads/New/<?php echo \Auth::user()->id.'/'.date("Ymd").'_'; ?>' + fil['name'] + "?" + new Date().getTime() + '" target="_blank" />';
+			msg = msg + '<img src="<?php echo $url; ?>' + img + '" height="30" align="right" border="0" />';
 			msg = msg + '</a>';
-			msg = msg + ((xhttpUPLD.responseText == 0) ? '<?php echo __('tinyissue.fileupload_succes'); ?>' : '<?php echo __('tinyissue.fileupload_failed'); ?>' );
-			if (xhttpUPLD.responseText == 0) { msg = msg + '<a href="' + img + '" target="_blank">'; }
+			msg = msg + ((xhttpUPLD.responseText != 0) ? '<?php echo __('tinyissue.fileupload_succes'); ?>' : '<?php echo __('tinyissue.fileupload_failed'); ?>' );
+			if (xhttpUPLD.responseText != 0) { msg = msg + '<a href="<?php echo $url; ?>uploads/New/<?php echo \Auth::user()->id.'/'.date("Ymd").'_'; ?>' + fil['name'] + "?" + new Date().getTime() + '" tlank">'; }
 			msg = msg + '<b>' + fil['name'] + '</b>';
-			if (xhttpUPLD.responseText == 0) { msg = msg + '</a>'; }
+			if (xhttpUPLD.responseText != 0) { msg = msg + '</a>'; }
+			
 			msg = msg + '</div></div></div>';
 			document.getElementById(IDcomment).innerHTML = msg;
 			document.getElementById("file_upload").value = "";

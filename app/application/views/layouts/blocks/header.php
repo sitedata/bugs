@@ -32,9 +32,9 @@
 		<?php echo Asset::styles(); ?>
 		<?php echo Asset::scripts(); ?>
 		<?php
-//Patrick, il faudra retirer cette protection temporaire
-//Il faut pourtant trouver un moyen de connaître l'état « En ligne » ou « Hors ligne » de l'utilisateur.
-$EnLigne = false;
+			//Testons si l'usager en ligne en faisant ping 8.8.8.8
+			$pingresult = exec("/bin/ping -n 3 8.8.8.8", $outcome, $status);
+			$EnLigne = (0 == $status) ? true : false;
 			if (date("Y-m-d", fileatime ("../install/get_updates_list")) != date("Y-m-d") && $EnLigne) {
 				include "../app/application/libraries/checkVersion.php";
 				$Etat =  ($verActu == $verNum) ? '' :  $styleAdmin = 'class=".blink_me" style="color: yellow; text-decoration: underline wavy red; " ';
@@ -69,7 +69,7 @@ $EnLigne = false;
 					<ul>
 						<li class="dashboard <?php echo $active == 'dashboard' ? 'active' : ''; ?>"><a href="<?php echo URL::to(); ?>"><?php echo __('tinyissue.dashboard');?></a></li>
 						<li class="issues <?php echo $active == 'issues' ? 'active' : ''; ?>"><a href="<?php echo URL::to('user/issues'); ?>"><?php echo __('tinyissue.your_issues');?></a></li>
-						<li class="todo <?php echo $active == 'todo' ? 'active' : ''; ?>"><a href="<?php echo URL::to('todo'); ?>"><?php echo __('tinyissue.your_todos');?></a></li>
+						<?php if (Auth::user()->role_id != 1) { ?><li class="todo <?php echo $active == 'todo' ? 'active' : ''; ?>"><a href="<?php echo URL::to('todo'); ?>"><?php echo __('tinyissue.your_todos');?></a></li><?php } ?>
 						<li class="projects <?php echo $active == 'projects' ? 'active' : ''; ?>"><a href="<?php echo URL::to('projects'); ?>"><?php echo __('tinyissue.projects');?></a></li>
 					</ul>
 				</li>
@@ -77,13 +77,25 @@ $EnLigne = false;
 
 			<nav class="nav-right">
 				<ul>
-					<li><?php echo __('tinyissue.welcome');?>, <a href="<?php echo URL::to('user/settings'); ?>" class="user"><?php echo Auth::user()->firstname; ?></a></li>
-					<li class="reports <?php echo $active == 'repprts' ? 'active' : ''; ?>"><a href="<?php echo URL::to('projects/reports'); ?>" "><?php echo __('tinyissue.report');?></a></li>
-					<?php if(Auth::user()->permission('administration')): ?>
-					<li><a href="<?php echo URL::to('administration/users'); ?>"><?php echo __('tinyissue.users');?></a></li>
-					<li><a href="<?php echo URL::to('administration'); ?>" <?php echo $styleAdmin; ?>><?php echo __('tinyissue.administration');?></a></li>
-					<?php endif; ?>
-					<li class="logout"><a href="<?php echo URL::to('user/logout'); ?>"><?php echo __('tinyissue.logout');?></a></li>
+				<?php
+					echo __('tinyissue.welcome').', <a href="'.URL::to('user/settings').'" class="user">'.Auth::user()->firstname.'</a></li>';
+					if (\Role\Permission::inherits_permission(array('reports-view','reports-create','project-create'))) {
+						echo '<li class="reports '.(($active == 'repprts') ? 'active' : '').'">';
+						echo '<a href="'.URL::to('projects/reports').'" ">'.__('tinyissue.report').'</a>';
+						echo '</li>';
+					}
+					if (Auth::user()->permission('administration')) {
+						echo '<li>';
+						echo '<a href="'.URL::to('administration/users').'">'.__('tinyissue.users').'</a>';
+						echo '</li>';
+						echo '<li>';
+						echo '<a href="'.URL::to('administration').'" '.$styleAdmin.'>'. __('tinyissue.administration').'</a>';
+						echo '</li>';
+					}
+					echo '<li class="logout">';
+					echo '<a href="'.URL::to('user/logout').'">'. __('tinyissue.logout').'</a>';
+					echo '</li>';
+				 ?>
 				</ul>
 			</nav>
 

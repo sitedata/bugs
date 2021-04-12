@@ -1,9 +1,13 @@
+<?php 
+	if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
+		echo '<script>document.location.href="'.URL::to().'";</script>';
+	}
+?>
 <h3>
-	<?php echo __('tinyissue.edit_issue'); ?>
+	<?php echo __('tinyissue.edit_issue').'&nbsp;&nbsp;&nbsp<a href="index" style="color: #138dc1;">'.Input::old('title', $issue->title).'</a>'; ?>
 </h3>
 
 <div class="pad">
-
 	<form method="post" action="">
 
 		<table class="form" style="width: 100%;">
@@ -71,6 +75,68 @@
 	</form>
 
 </div>
+
+<?php
+$active_projects =Project\User::active_projects();
+if (count($active_projects)>1 && $issue->closed_by == 0 ) {
+?>
+<hr style="width: 80%; margin-top: 50px; margin-bottom: 40px;" />
+<div id="ChangeProjectthisIssue" style="text-align: left; margin-left: 10%; width: 100%;">
+<!-- 
+	<form class="projects_selector" name="projectChanger">
+ -->
+<form method="GET" action="" name="projectChanger">
+<fieldset class="sidebar_Projects_label"><label for="projects_select"><?php echo __('tinyissue.select_to_project');?> : </label>
+<select name="projectNew" id="project_newSelect" onchange="Issue_ChgListMbre(this.value);" >
+<?php
+	$NbIssues = array();
+	$Proj = array();
+	$SansAccent = array();
+	foreach($active_projects as $row) {
+		$NbIssues[$row->id] = $row->count_open_issues();
+		//$NbIssues[$row->to()] = $row->count_open_issues();
+		//$Proj[$row->to()] = $row->name.' ('.$NbIssues[$row->to()].')';
+		$Proj[$row->id] = $row->name.' ('.$NbIssues[$row->id].')';
+	}
+	foreach ($Proj as $ind => $val ){
+		$SansAccent[$ind] = htmlentities($val, ENT_NOQUOTES, 'utf-8');
+		$SansAccent[$ind] = preg_replace('#&([A-za-z])(?:uml|circ|tilde|acute|grave|cedil|ring);#', '\1', $SansAccent[$ind]);
+		$SansAccent[$ind] = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $SansAccent[$ind]);
+		$SansAccent[$ind] = preg_replace('#&[^;]+;#', '', $SansAccent[$ind]);
+	}
+	asort($SansAccent);
+
+	foreach($SansAccent as $ind => $val) {
+		$selected = ($ind == Project::current()->id) ? 'selected="selected"':'';
+		echo '<option value="'.$ind.'" '.$selected.'>'.$Proj[$ind].'</option>';
+	 }
+?>
+</select>
+&nbsp;&nbsp;&nbsp;
+<label for="projects_select_resp"><?php echo __('tinyissue.select_to_projectResp');?> : </label>
+<select name="projectNewResp" id="project_newSelectResp" >
+<?php 
+	foreach(Project::current()->users()->get() as $row) { 
+		echo '<option value="'.$row->id.'" ';
+		echo ($row->id == $issue->assigned_to ) ? 'selected="selected"' : '';
+		echo '>'.$row->firstname . ' ' . $row->lastname.'</option>';
+	}
+?>
+</select>
+&nbsp;&nbsp;&nbsp;
+<input type="submit" value="<?php echo __('tinyissue.selected_to_project'); ?>" style="color: navy; padding: 3px 10px; border:none;" />
+<input type="hidden" name="projetOld" value="<?php echo Project::current()->id; ?>" />
+<input type="hidden" name="ticketNum" value="<?php echo $issue->id; ?>" />
+<input type="hidden" name="ticketAct" value="changeProject" />
+</fieldset>
+</form>
+
+</div>
+<hr style="width: 80%; margin-top: 25px; margin-bottom: 50px;" />
+<?php
+}
+?>
+
 <script type="text/javascript">
 var d = new Date();
 var t = d.getTime();

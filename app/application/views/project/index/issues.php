@@ -1,6 +1,9 @@
 <?php 
 $config_app = require path('public') . 'config.app.php';  
 if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = array("black","Orchid","Cyan","Lime","orange","red"); }
+if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
+	echo '<script>document.location.href="'.URL::to().'";</script>';
+}
 ?>
 <div class="blue-box">
 	<div class="inside-pad filterANDsort">
@@ -33,7 +36,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 						<?php echo Form::select('assigned_to', $assigned_users, Input::get('assigned_to', '')); ?>
 						<br /><br />
 						<?php echo Form::select('limit_event', array('created_at' => __('tinyissue.limits_event_createdat'),'updated_at' => __('tinyissue.limits_event_updatedAt'),'closed_at'  => __('tinyissue.limits_event_closedAt')), Input::get('limit_event', '')); ?>
-						<?php echo Form::select('limit_period',array('' => "", 'week' 	=> __('tinyissue.limits_period_week'),'month' 	=> __('tinyissue.limits_period_month'),'months' => __('tinyissue.limits_period_months')), Input::get('limit_period', ''),array("onchange"=>"CalculonsDates(this.value);" ) ); ?>
+						<?php echo Form::select('limit_period',array('' => "", 'week' 	=> __('tinyissue.limits_period_week'),'month' 	=> __('tinyissue.limits_period_month'),'months' => __('tinyissue.limits_period_months'),'years' => __('tinyissue.limits_period_years')), Input::get('limit_period', ''),array("onchange"=>"CalculonsDates(this.value);" ) ); ?>
 						<br /><br />
 						<?php echo Form::date('DateInit', input::get('DateInit',(date("Y")-1).date("-m-d")), array('id' => 'input_DateInit')); ?>
 						<?php echo Form::date('DateFina', input::get('DateFina',date("Y-m-d")), array('id' => 'input_DateFina')); ?>
@@ -75,7 +78,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 				</div>
 				<?php endif; ?>
 
-				<a href="" class="id">#<?php echo $row->id; ?><?php if(@$_GET["tag_id"] ==1 ) { ?><br /><br /><span style="color: <?php echo $config_app['PriorityColors'][$row->status]; ?>; font-size: 200%;">&#9899;</span><?php } ?></span></a>
+				<a href="" class="id">#<?php echo $row->id; ?><br /><br /><span style="color: <?php echo $config_app['PriorityColors'][$row->status]; ?>; font-size: 200%;">&#9899;</span></span></a>
 				<div class="data">
 					<a href="<?php echo $row->to(); ?>"><?php echo $row->title; ?></a>
 					<div class="info">
@@ -98,7 +101,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 
 					</div>
 					<?php
-					if (@$_GET["tag_id"] == 1) {
+					if (@$_GET["tag_id"] == 1 && Auth::user()->role_id != 1) {
 						echo '<br /><br />';
 								//Percentage of work done
 								////Calculations
@@ -126,15 +129,15 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 								$DurColor = ($DurRelat < 65) ? 'green' : (( $DurRelat > $config_app['Percent'][3]) ? 'red' : 'yellow') ;
 								if ($DurRelat >= 50 && @$Etat->weight <= 50 ) { $DurColor = 'yellow'; }
 								if ($DurRelat >= 75 && @$Etat->weight <= 50 ) { $DurColor = 'red'; }
-								$TxtColor = ($DurColor == 'green') ? 'white' : 'black' ;
+								$TxtColor = ($DurColor == 'yellow') ? 'black' : 'white' ;
 								////Here we show to progress bar
 //								echo __('tinyissue.countdown').' ('.__('tinyissue.day').'s) : ';
 								echo '<div class="Percent2">';
 								echo '<div style="background-color: '.$DurColor.'; position: absolute; top: 0; left: 0; width: '.(($DurRelat <= 100) ? $DurRelat : 100).'%; height: 100%; text-align: center; line-height:20px;" />'.((($DurRelat  >= 100)) ? $Dur.' / '.@$row->duration : $Dur).'</div>';
 								if ($DurRelat < 100) {  echo '<div style="background-color: gray; position: absolute;  top: 0; left: '.$DurRelat.'%; width: '.(100-$DurRelat).'%; height: 100%; text-align: center; line-height:20px;" />'.$row->duration.'</div>'; }
 								echo '</div>';
-						echo '<br clear="all" />';
 					}
+					echo '<br clear="all" />';
 
 					?>
 				</div>
@@ -142,7 +145,9 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 			<?php endforeach; ?>
 		</ul>
 		<?php endif; ?>
+		<?php if (Auth::user()->role_id != 1) { ?>
 		<div id="sortable-msg"><?php echo __('tinyissue.sortable_issue_howto'); ?></div>
+		<?php } ?>
 		<div id="sortable-save"><input id="sortable-save-button" class="button primary" type="submit" value="<?php echo __('tinyissue.save'); ?>" /></div>
 	</div>
 </div>
@@ -150,12 +155,24 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 function CalculonsDates(Quoi) {
 	var auj = new Date();
 	var dat = new Date();
+	var yyyy = auj.getFullYear();
+	var mm = auj.getMonth()+1; //January is 0!
+	var dd = auj.getDate();
+	mm = (mm < 10) ? '0'+ mm : mm;	
+	dd = (dd < 10) ? '0'+ dd : dd;	
+	document.getElementById('input_DateInit').value = yyyy + '-' + mm + '-' + dd;
 	var duree = 365;
 	if (Quoi == 'week') { duree = 7; }
 	if (Quoi == 'month') { duree = 31; }
 	if (Quoi == 'months') { duree = 62; }
-	dat.setDate(auj.getDate() - duree);
-	document.getElementById('input_DateInit').value = dat.getFullYear()+"-"+pad((dat.getMonth()+1),2)+"-"+pad(dat.getDate(),2);
+	if (Quoi == 'years') { duree = 365; }
+	dat.setDate(dat.getDate() - duree);
+	yyyy = dat.getFullYear();
+	mm = dat.getMonth()+1; //January is 0!
+	dd = dat.getDate();
+	mm = (mm < 10) ? '0'+ mm : mm;	
+	dd = (dd < 10) ? '0'+ dd : dd;	
+	document.getElementById('input_DateFina').value = yyyy + '-' + mm + '-' + dd;
 }
 function pad(n, width, z) {
   z = z || '0';

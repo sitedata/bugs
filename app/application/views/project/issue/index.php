@@ -1,12 +1,18 @@
 <?php 
-$config_app = require path('public') . 'config.app.php';  
-if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = array("black","Orchid","Cyan","Lime","orange","red"); }
+	$config_app = require path('public') . 'config.app.php';  
+	if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = array("black","Orchid","Cyan","Lime","orange","red"); }
+	$url =\URL::home();
+	if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
+		echo '<script>document.location.href="'.URL::to().'";</script>';
+	}
 ?>
 <h3>
+	<?php if (Auth::user()->role_id != 1) { ?>
 	<a href="<?php echo Project::current()->to('issue/new'); ?>" class="newissue"><?php echo __('tinyissue.new_issue'); ?></a>
+   <?php } ?> 
 
 	<span style="color: <?php echo $config_app['PriorityColors'][$issue->status]; ?>; font-size: 200%;">&#9899;
-	<?php if(Auth::user()->permission('issue-modify')): ?>
+	<?php if(Auth::user()->permission('issue-modify') && $issue->status > 0 ): ?>
 	<a href="<?php echo $issue->to('edit'); ?>" class="edit-issue" style="font-size: 80%; font-weight: bold;"><?php echo $issue->title; ?></a>
 	<?php else: ?>
 	<a href="<?php echo $issue->to(); ?>" style="font-size: 80%; font-weight: bold;"><?php echo $issue->title; ?></a>
@@ -19,42 +25,45 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 
 	<div id="issue-tags">
 	<?php
-		//Percentage of work done
-		////Calculations
-		$SizeXtot = 500;
-		$SizeX = $SizeXtot / 100;
-		echo __('tinyissue.issue_percent').' : ';
-		$Etat = Todo::load_todo($issue->id);
-		////Here we show the progress bar
-		if (is_object($Etat)) {
+			//Percentage of work done
+			////Calculations
+			$SizeXtot = 500;
+			$SizeX = $SizeXtot / 100;
+			echo __('tinyissue.issue_percent').' : ';
+			$EtatTodo = Todo::load_todo($issue->id);
+			////Here we show the progress bar
+		if (Auth::user()->role_id != 1) {
+			if (is_object($EtatTodo)) {
+				echo '<div class="Percent">';
+				echo '<div style="background-color: green; position: absolute; top: 0; left: 0; width: '.($EtatTodo->weight).'%; height: 100%; text-align: center; line-height:20px;" />'.$EtatTodo->weight.'%</div>';
+				echo '<div style="background-color: gray; position: absolute;  top: 0; left: '.$EtatTodo->weight.'%; width: '.(100-$EtatTodo->weight).'%; height: 100%; text-align: center; line-height:20px;" />'.(100-$EtatTodo->weight).'%</div>';
+				echo '</div>';
+			}
+	
+			//Time's going fast!
+			//Timing bar, according to the time planified (field projects_issues - duration) for this issue
+			////Calculations
+			$config_app = require path('public') . 'config.app.php';
+			$Deb = strtotime($issue->created_at);
+			$Dur = (time() - $Deb) / 86400;
+			if (@$issue->duration === 0 || @is_null($issue->duration)) { $issue->duration = 30; }
+			$DurRelat = round(($Dur / $issue->duration) * 100);
+			$Dur = round($Dur);
+			$DurColoF = ($DurRelat < 65) ? 'white' : (( $DurRelat > $config_app['Percent'][3]) ? 'white' : 'black') ;
+			$DurColor = ($DurRelat < 65) ? 'green' : (( $DurRelat > $config_app['Percent'][3]) ? 'red' : 'yellow') ;
+			if ($DurRelat >= 50 && @$EtatTodo->weight <= 50 ) { $DurColor = 'yellow'; }
+			if ($DurRelat >= 75 && @$EtatTodo->weight <= 50 ) { $DurColor = 'red'; }
+			$TxtColor = ($DurColor == 'green') ? 'white' : 'black' ;
+			////Here we show to progress bar
+			echo __('tinyissue.countdown').' ('.__('tinyissue.day').'s) : ';
 			echo '<div class="Percent">';
-			echo '<div style="background-color: green; position: absolute; top: 0; left: 0; width: '.($Etat->weight).'%; height: 100%; text-align: center; line-height:20px;" />'.$Etat->weight.'%</div>';
-			echo '<div style="background-color: gray; position: absolute;  top: 0; left: '.$Etat->weight.'%; width: '.(100-$Etat->weight).'%; height: 100%; text-align: center; line-height:20px;" />'.(100-$Etat->weight).'%</div>';
+			echo '<div style="color: '.$DurColoF.'; background-color: '.$DurColor.'; position: absolute; top: 0; left: 0; width: '.(($DurRelat <= 100) ? $DurRelat : 100).'%; height: 100%; text-align: center; line-height:20px;" />'.((($DurRelat  >= 100)) ? $Dur.' / '.@$issue->duration : $Dur).'</div>';
+			if ($DurRelat < 100) {  echo '<div style="background-color: gray; position: absolute;  top: 0; left: '.$DurRelat.'%; width: '.(100-$DurRelat).'%; height: 100%; text-align: center; line-height:20px;" />'.$issue->duration.'</div>'; }
 			echo '</div>';
+	
+	
+			echo '<br clear="all" />';
 		}
-
-		//Time's going fast!
-		//Timing bar, according to the time planified (field projects_issues - duration) for this issue
-		////Calculations
-		$config_app = require path('public') . 'config.app.php';
-		$Deb = strtotime($issue->created_at);
-		$Dur = (time() - $Deb) / 86400;
-		if (@$issue->duration === 0 || @is_null($issue->duration)) { $issue->duration = 30; }
-		$DurRelat = round(($Dur / $issue->duration) * 100);
-		$Dur = round($Dur);
-		$DurColor = ($DurRelat < 65) ? 'green' : (( $DurRelat > $config_app['Percent'][3]) ? 'red' : 'yellow') ;
-		if ($DurRelat >= 50 && @$Etat->weight <= 50 ) { $DurColor = 'yellow'; }
-		if ($DurRelat >= 75 && @$Etat->weight <= 50 ) { $DurColor = 'red'; }
-		$TxtColor = ($DurColor == 'green') ? 'white' : 'black' ;
-		////Here we show to progress bar
-		echo __('tinyissue.countdown').' ('.__('tinyissue.day').'s) : ';
-		echo '<div class="Percent">';
-		echo '<div style="background-color: '.$DurColor.'; position: absolute; top: 0; left: 0; width: '.(($DurRelat <= 100) ? $DurRelat : 100).'%; height: 100%; text-align: center; line-height:20px;" />'.((($DurRelat  >= 100)) ? $Dur.' / '.@$issue->duration : $Dur).'</div>';
-		if ($DurRelat < 100) {  echo '<div style="background-color: gray; position: absolute;  top: 0; left: '.$DurRelat.'%; width: '.(100-$DurRelat).'%; height: 100%; text-align: center; line-height:20px;" />'.$issue->duration.'</div>'; }
-		echo '</div>';
-
-
-		echo '<br clear="all" />';
 
 		$IssueTags = array();
 		if(!empty($issue->tags)) {
@@ -95,9 +104,11 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 			</div>
 		</li>
 
-		<?php foreach($issue->activity() as $activity): ?>
-			<?php echo $activity; ?>
-		<?php endforeach; ?>
+		<?php 
+			foreach($issue->activity() as $activity) {
+				echo (strlen($activity) > 1) ? $activity : '';
+			}
+		?>
 	</ul>
 	<div id="div_currentlyAssigned_name" class="topbar"></div>
 
@@ -152,33 +163,39 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 			<?php echo __('tinyissue.comment_on_this_issue'); ?>
 		</h4>
 
-		<form method="post" action="" enctype="multipart/form-data">
+		<form method="post" id="NewComment" action="" enctype="multipart/form-data">
 			<p>
 				<textarea name="comment" id="textarea_comment_0" style="width: 98%; height: 90px;"></textarea>
 				<!-- New options in the form : percentage of work done after this ticket  -->
-				<span style="text-align: left; width: 50%;">
+				<br />
+				<span style="text-align: left;">
 				<?php 
-					$percent = ((is_object($Etat)) ? (($Etat->weight == 100) ? 91 : $Etat->weight+1) : 10 );
+					$percent = ((is_object($EtatTodo)) ? (($EtatTodo->weight == 100) ? 91 : $EtatTodo->weight+1) : 10 );
 					if (Project\Issue::current()->assigned->id == \Auth::user()->id ) { 
-						echo __('tinyissue.percentage_of_work_done').':';
+						echo '<b>'.__('tinyissue.percentage_of_work_done').'</b> : ';
 						echo '<input type="number" name="Pourcentage" value="'.$percent.'" min="'.$percent.'" max="100" /> %';
-					} else { 
-						echo '<br />'; 
-						echo __('tinyissue.percentage_of_work_done').':&nbsp;&nbsp;';
-						echo $percent;
-						echo '<input type="hidden" name="Pourcentage" value="'.$percent.'"  /> %';
-						echo '<br />'; 
-					} 
-				?>
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+						echo '<b>'.__('tinyissue.priority').'</b> : ';
+						echo '&nbsp;&nbsp;&nbsp;';
+						echo Form::select('status', array(0=>__('tinyissue.priority_desc_0'),1=>__('tinyissue.priority_desc_1'),2=>__('tinyissue.priority_desc_2'),3=>__('tinyissue.priority_desc_3'),4=>__('tinyissue.priority_desc_4'),5=>__('tinyissue.priority_desc_5')), $issue->status); 
+					} else {
+						if (Auth::user()->role_id != 1 ) { 
+							echo '<br />'; 
+							echo '<b>'.__('tinyissue.percentage_of_work_done').'</b> : ';
+							echo '<input type="hidden" name="Pourcentage" value="'.$percent.'"  /> '.$percent.' %';
+							echo '<b>'.__('tinyissue.priority').'</b> : ';
+							echo '<input type="hidden" name="status" value="'.$issue->status.'"  /> '.__('tinyissue.priority_desc_'.$issue->status);
+						}
+					}	
+					echo '<br />'; 
+				?>					
 				</span>
-				<div style="text-align: right; width: 98%; margin-top: -25px;">
-
- 				<br /><br />
- 				</div>
-					<div style="width: 90%">
-						<!-- Tags modification  -->
+				<div style="text-align: right; width: 98%; margin-top: -25px;"><br /><br /></div>
+			<?php  if (Auth::user()->role_id != 1) { ?>
+					<!-- Tags modification  -->
+					<span style="float:left; font-weight: bold; margin: 7px;"><?php echo  __('tinyissue.tags'); ?></span>
+					<div style="width: 73%; float: left">
 						<?php
-							echo __('tinyissue.tags');
 							$TAGS = new Project_Issue_Controller();
 							$Tomates = $TAGS->get_edit($issue->id);
 							$Retagage = $TAGS->get_retag($issue->id);
@@ -195,6 +212,8 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 						</script>
 					</div>
 			</p>
+			<br /><br />
+
 			<ul id="uploaded-attachments">
 				<p>
 					<div id="div_upload" class="upload-wrap green-button" onclick="document.getElementById('div_upload').style.width = '280px'; document.getElementById('span_butupload').style.display = 'block'; ">
@@ -209,11 +228,19 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 					</div>
 				</p>
 			</ul>
+			<?php  } ?>
 
-			<p style="margin-top: 10px;">
-				<input type="submit" class="button primary" value="<?php echo __('tinyissue.comment'); ?>" />
-			</p>
 
+				<p>
+					<input id="input_submitComment" type="submit" class="button primary" value="<?php echo __('tinyissue.comment'); ?>" />
+				<?php if (Project\Issue::current()->assigned->id == \Auth::user()->id ) { ?>
+					<input id="input_CloseComment" type="button"  class="button primary button2" style="position: relative; margin-left: 35px;" value="<?php echo __('tinyissue.closecomment_issue'); ?>"  onclick="if (confirm('<?php echo __('tinyissue.close_issue_confirm'); ?>')) { document.getElementById('input_Fermons').value = '0'; document.getElementById('NewComment').submit();}" />
+				<?php } ?>
+				</p>
+			<input name="Fermons" id="input_Fermons" type="hidden" value="<?php echo $issue->status; ?>" />
+			<?php 
+			//echo Form::hidden('Fermons', $issue->status); 
+			?>
 			<?php echo Form::hidden('session', Crypter::encrypt(Auth::user()->id)); ?>
 			<?php echo Form::hidden('project_id', $project->id); ?>
 			<?php echo Form::hidden('token', md5($project->id . time() . \Auth::user()->id . rand(1, 100))); ?>
@@ -224,7 +251,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 
 	</div>
 	<?php else: ?>
-	<?php echo HTML::link(Project\Issue::current()->to('status?status=1'), __('tinyissue.reopen_issue')); ?>
+	<?php if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) { echo HTML::link(Project\Issue::current()->to('status?status=1'), __('tinyissue.reopen_issue')); } ?>
 	<br /><br />
 	<?php endif; ?>
 	<br /><br />
@@ -262,7 +289,7 @@ function IMGupload(input) {
 	var IDcomment = 'comment' + new Date().getTime();
 	var fil = document.getElementById("file_upload").files[0];
 	var ext = fil['name'].substring(fil['name'].lastIndexOf('.') + 1).toLowerCase();
-	var img = "../../../../app/assets/images/icons/file_01.png?"; 
+	var img = "<?php echo $url; ?>app/assets/images/icons/file_01.png?"; 
 	var xhttpCHK = new XMLHttpRequest();
 	var CheckPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/checkExt?ext=' + ext;
 	xhttpCHK.onreadystatechange = function() {
@@ -270,9 +297,9 @@ function IMGupload(input) {
 			var formdata = new FormData();
 			formdata.append("Loading", fil);
 			if (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg") { 
-				img = "../../../../uploads/" + fil['name'];
+				img = "<?php echo $url; ?>uploads/" + fil['name'];
 			} else if (xhttpCHK.responseText == 'yes' ) {
-				img = "../../../../app/assets/images/upload_type/" + ext + ".png";
+				img = "<?php echo $url; ?>app/assets/images/upload_type/" + ext + ".png";
 			}
 			var xhttpUPLD = new XMLHttpRequest();
 			var NextPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/upload?Nom=' + fil['name'];
@@ -376,12 +403,11 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 	xhttpASGMT.send(); 
 }
 
-
 <?php
 	$wysiwyg = Config::get('application.editor');
 	if (trim(@$wysiwyg['directory']) != '') {
 		if (file_exists($wysiwyg['directory']."/Bugs_code/showeditor.js")) {
-			include_once $wysiwyg['directory']."/Bugs_code/showeditor.js"; 
+			include $wysiwyg['directory']."/Bugs_code/showeditor.js"; 
 			if ($wysiwyg['name'] == 'ckeditor') {
 				echo "
 				setTimeout(function() {
@@ -392,5 +418,4 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 		} 
 	} 
 ?>
-	//setTimeout(function() { var debut = LitTags (); } , 497);
 </script>
