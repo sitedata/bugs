@@ -13,13 +13,12 @@
 		var xhttp = new XMLHttpRequest();
 		var NextPage = 'app/application/controllers/ajax/ChgConfEmail.php?fName=' + document.getElementById('input_email_from_name').value + '&fMail=' + document.getElementById('input_email_from_email').value + '&rName=' + document.getElementById('input_email_replyto_name').value + '&rMail=' + document.getElementById('input_email_replyto_email').value + '&intro=' + document.getElementById('input_email_intro').value + '&bye='+document.getElementById('input_email_bye').value;
 		xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			if (xhttp.responseText != '' ) {
-				//alert(xhttp.responseText);
-				for (x=0; x<champs.length; x++) {
-					document.getElementById(champs[x]).style.backgroundColor = 'green';
-				}
-				var blanc = setTimeout(function() { for (x=0; x<champs.length; x++) { document.getElementById(champs[x]).style.backgroundColor = 'white'; } }, 5000);
+			if (this.readyState == 4 && this.status == 200) {
+				if (xhttp.responseText != '' ) {
+					for (x=0; x<champs.length; x++) {
+						document.getElementById(champs[x]).style.backgroundColor = 'green';
+					}
+					var blanc = setTimeout(function() { for (x=0; x<champs.length; x++) { document.getElementById(champs[x]).style.backgroundColor = 'white'; } }, 5000);
 				}
 			}
 		};
@@ -50,13 +49,14 @@
 
 	function ChangeonsText(Quel, Langue, Question) {
 		var texte = CachonsEditor(9);
-		var Enreg = false;
-		if (texte != TexteInital) { Enreg = confirm(Question); }
+		var Enreg = (Question == 'OUI') ? true : false;
+		if (texte != TexteInital && Enreg == false) { Enreg = confirm(Question); }
 		var formdata = new FormData();
 		formdata.append("Quel", Affiche);
 		formdata.append("Enreg", Enreg);
 		formdata.append("Prec", texte);
 		formdata.append("Suiv", Quel);
+		formdata.append("Titre", document.getElementById('input_TitreMsg').value);
 		formdata.append("Lang", Langue);
 		var xhttp = new XMLHttpRequest();
 		var NextPage = 'app/application/controllers/ajax/ChgConfEmail_Textes.php';
@@ -64,8 +64,12 @@
 			if (this.readyState == 4 && this.status == 200) {
 				if (xhttp.responseText != '' ) {
 					Affiche = Quel;
-					TexteInital = xhttp.responseText;
+					if (Question == 'OUI') { alert("Mise à jour complétée"); }
+					var r = xhttp.responseText;
+					var recu = r.split('||');
+					TexteInital = recu[0];
 					ChangeonsEditor(9, TexteInital);
+					document.getElementById('input_TitreMsg').value = recu[1];
 				}
 			}
 		};
