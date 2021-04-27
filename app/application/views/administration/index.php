@@ -109,12 +109,13 @@
 		<?php $Conf = Config::get('application.mail'); ?>
 		<details id="details_email_head" open="open">
 			<summary><?php echo __('tinyissue.email_head'); ?></summary>
+			<br />
 			<div class="pad2">
 				<?php echo __('tinyissue.email_from'); ?> : <?php echo __('tinyissue.email_from_name'); ?> : <input name="email_from_name" id="input_email_from_name" value="<?php echo $Conf["from"]["name"]; ?>" onkeyup="this.style.backgroundColor = 'yellow';" /><br />
 				<?php echo __('tinyissue.email_from'); ?> : <?php echo __('tinyissue.email_from_email'); ?> : <input name="email_from_email" id="input_email_from_email" value="<?php echo $Conf["from"]["email"]; ?>" onkeyup="this.style.backgroundColor = 'yellow';" /><br /><br />
 				<?php echo __('tinyissue.email_intro'); ?> : <input name="email_from" id="input_email_intro" value="<?php echo $Conf["intro"]; ?>" onkeyup="this.style.backgroundColor = 'yellow';" /><br /><br />
 				<?php echo __('tinyissue.email_bye'); ?> : <input name="email_from" id="input_email_bye" value="<?php echo $Conf["bye"]; ?>" onkeyup="this.style.backgroundColor = 'yellow';" /><br /><br />
-				<div style="text-align: center;"><input type="button" value="Test" onclick="javascript: AppliquerTest();" class="button1"/></div>
+				<div style="text-align: center;"><input type="button" value="Test" onclick="javascript: AppliquerTest(<?php echo Auth::user()->id; ?>);" class="button1"/></div>
 				<br />
 			</div>
 			<div class="pad2">
@@ -130,10 +131,11 @@
 		</details>
 		<details id="details_email_head2">
 			<summary><?php echo __('tinyissue.email_head2'); ?></summary>
+			<br />
 			<div class="pad2">
-			<select name="ChxTxt" id="select_ChxTxt" onchange="ChangeonsText(this.value);" class="sombre">
+			<select name="ChxTxt" id="select_ChxTxt" onchange="ChangeonsText(this.value, <?php echo "'".\Auth::user()->language."','".__('tinyissue.following_email')."'"; ?>);" class="sombre">
 			<?php
-				echo '<option value="attached">'.	__('tinyissue.following_email_attached_tit').'</option>';
+				echo '<option value="attached" selected>'.__('tinyissue.following_email_attached_tit').'</option>';
 				echo '<option value="assigned">'.	__('tinyissue.following_email_assigned_tit').'</option>';
 				echo '<option value="comment">'. 	__('tinyissue.following_email_comment_tit').'</option>';
 				echo '<option value="issue">'.		__('tinyissue.following_email_issue_tit').'</option>';
@@ -142,23 +144,34 @@
 				echo '<option value="project">'.		__('tinyissue.following_email_project_tit').'</option>';
 				echo '<option value="projectdel">'.	__('tinyissue.following_email_projectdel_tit').'</option>';
 				echo '<option value="projectmod">'.	__('tinyissue.following_email_projectmod_tit').'</option>';
-				echo '<option value="tags">'.			__('tinyissue.following_email_tags_tit').'</option>';
+				echo '<option value="tagsADD">'.		__('tinyissue.following_email_tagsADD_tit').'</option>';
+				echo '<option value="tagsOTE">'.		__('tinyissue.following_email_tagsOTE_tit').'</option>';
 			?>
 			</select>
+			&nbsp;&nbsp;&nbsp;<?php echo __('tinyissue.title'); ?> : <input name="TitreMsg" id="input_TitreMsg" value="<?php
+				if (file_exists("../uploads/attached_tit.html")) {
+					$f = file_get_contents("../uploads/attached_tit.html");
+					echo $f;
+				} else {
+					echo  __('tinyissue.tinyissue.following_email_attached_tit');
+				}
+			?>" size="50" />
 			</div>
 			<div class="pad2"style="font-size: 125%; padding-top: 15px;">
 				{first}, {last}, {full}, {project}, {issue}
 			</div>
 			<br />
-			<textarea id="txt_contenu" name="contenu">
-				<?php 
+			<textarea id="txt_contenu" name="contenu" >
+			<?php
 				if (file_exists("../uploads/attached.html")) {
 					$f = file_get_contents("../uploads/attached.html");
 					echo $f;
-				} else { 
-					echo  __('tinyissue.tinyissue.following_email_attached'); 
-				} 
-			?></textarea>
+				} else {
+					echo  __('tinyissue.tinyissue.following_email_attached');
+				}
+			?>
+			</textarea>
+			<input name="Modifies" type="hidden" id="input_modifies" value="0" />
 		</details>
 	<br />
 	</div>
@@ -169,15 +182,15 @@
 	$wysiwyg = Config::get('application.editor');
 	if (trim(@$wysiwyg['directory']) != '') {
 		if (file_exists($wysiwyg['directory']."/Bugs_code/showeditor.js")) {
-			include_once $wysiwyg['directory']."/Bugs_code/showeditor.js"; 
+			include_once $wysiwyg['directory']."/Bugs_code/showeditor.js";
 			if ($wysiwyg['name'] == 'ckeditor') {
 				echo "
 				setTimeout(function() {
-					showckeditor ('contenu');
+					showckeditor ('contenu', 9);
 				} , 567);
 				";
 			}
-		} 
-	} 
+		}
+	}
 ?>
 </script>

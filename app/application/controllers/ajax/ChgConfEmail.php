@@ -8,6 +8,9 @@
 	$NumLigne = array();
 	$NomFichier = $prefixe."config.app.php";
 	$rendu = 0;
+	foreach ($_GET AS $ind => $val) {
+		$_GET[$ind] = str_replace("'", "`", $val);
+	}
 
 	//Sauvegarde du fichier original
 	$SavFichier = "config.app.".date("Ymd").".php";
@@ -19,26 +22,39 @@
 	////Boucle de lecture
 	while (!feof($RefFichier)) {
 		$MesLignes[$rendu] = fgets($RefFichier);
-		if (strpos($MesLignes[$rendu], "mail' => array") !== false && !isset($NumLigne["mail"])) { $NumLigne["mail"] = $rendu; }  
-		if (strpos($MesLignes[$rendu], "* Final delivery format") !== false && @$NumLigne["mail"] > 0 && !isset($NumLigne["forma"])) { $NumLigne["forma"] = $rendu; }  
+		if (strpos($MesLignes[$rendu], "/**  Mail") 		!== false && !isset($NumLigne["mail_A"])) 										{ $NumLigne["mail_A"] = $rendu; }  
+		if (strpos($MesLignes[$rendu], "'replyTo'  =>") !== false && !isset($NumLigne["mail"])	 && @$NumLigne["mail_A"] > 0) 	{ $NumLigne["mail"] = $rendu; }  
+		if (strpos($MesLignes[$rendu], "'intro' =>") 	!== false && !isset($NumLigne["forma"]) && @$NumLigne["mail"] > 0) 		{ $NumLigne["forma"] = $rendu; }  
 		++$rendu;
 	}
 	fclose($RefFichier);
 
-	//Repérage des infomations intérssantes
-	$NumLigne["fName"] = $NumLigne["mail"] + 2; 
-	$NumLigne["fMail"] = $NumLigne["mail"] + 3; 
-	$NumLigne["rName"] = $NumLigne["mail"] + 6; 
-	$NumLigne["rMail"] = $NumLigne["mail"] + 7; 
-	$NumLigne["intro"] = $NumLigne["forma"] + 6; 
-	$NumLigne["bye"]   = $NumLigne["forma"] + 7;
-	unset( $NumLigne["mail"], $NumLigne["forma"]); 
-
-	//Changement des lignes repérées à la faveur des données soumises par l'usager
-	foreach ($NumLigne as $ind => $lgn) {
-		$MesLignes[$NumLigne[$ind]] = substr($MesLignes[$NumLigne[$ind]], 0, strpos($MesLignes[$NumLigne[$ind]], "=>") + 3 )."'".str_replace("'", "`",$_GET[$ind])."',
-"; 
-	}
+if ($NumLigne["mail"] > 0 ) {
+	$MesLignes[$NumLigne["mail"] - 5] = "	'mail' => array(
+";
+	$MesLignes[$NumLigne["mail"] - 4] = "		'from' => array(
+";
+	$MesLignes[$NumLigne["mail"] - 3] = "			'name' => '".$_GET["fName"]."',
+";
+	$MesLignes[$NumLigne["mail"] - 2] = "			'email' => '".$_GET["fMail"]."',
+";
+	$MesLignes[$NumLigne["mail"] - 1] = "		),
+";
+	$MesLignes[$NumLigne["mail"] + 0] = "		'replyTo'  => array(
+";
+	$MesLignes[$NumLigne["mail"] + 1] = "			'name' => '".$_GET["rName"]."',
+";
+	$MesLignes[$NumLigne["mail"] + 2] = "			'email' => '".$_GET["rMail"]."',
+";
+	$MesLignes[$NumLigne["mail"] + 3] = "		),
+";
+}
+if ($NumLigne["forma"] > 0) {
+	$MesLignes[$NumLigne["forma"] + 0] = "		'intro' => '".$_GET["intro"]."',
+";
+	$MesLignes[$NumLigne["forma"] + 1] = "		'bye' => '".$_GET["bye"]."',
+";
+}
 	
 	//Enregistrement du nouveau fichier corrigé  
 	$NeoFichier = fopen($NomFichier, "w");
@@ -46,5 +62,5 @@
 		fwrite($NeoFichier, $val);
 	}
 	fclose($NeoFichier);
-	echo 'Nous avons terminé';
+	echo 'Nous avons terminé\n '.$NumLigne["mail"].'\n'.$NumLigne["forma"].'';
 ?>
