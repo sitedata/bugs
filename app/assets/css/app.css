@@ -126,6 +126,7 @@ code{
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+  margin-right: 5px;
 }
 .label.important {
   background-color: #c43c35;
@@ -158,18 +159,19 @@ footer{
 
 /* Notices */
 .global-notice{
-	width: 100%;
+	min-width: 30%;
 	position: absolute;
-	top: 0; left: 0;
+	top: 55%; left: 30%;
 	background: #222727;
 	font-size: 15px;
-	color: #fff;
+	color: #f8e81c;
 	text-decoration: none;
 	text-align: center;
-	opacity: .95;
-	padding:  11px 0;
+	opacity: .85;
+	padding:  20px 0;
 	display: none;
 	z-index: 1000;
+	border-radius: 15px;
 }
 .global-notice.global-error{
 	background: #de2e2e!important;
@@ -213,7 +215,9 @@ textarea, input[type=text], input[type=password]{
 	box-shadow: 0 -1px 1px #b6b6b6;
 }
 .action,
-input[type=submit], input.button2 {
+input[type=submit], 
+input.button2,
+input.button1 {
 	font: bold 13px Helvetica, "Lucida Grande", Arial, sans-serif;
 	color: #fff;
 	padding: 10px 13px;
@@ -229,7 +233,9 @@ input[type=submit]{
 input[type=submit]:hover,
 input.button2:hover,
 input[type=submit]:focus,
-input.button2:focus{
+input.button2:focus,
+input.button1:focus,
+input.button1:hover {
 	cursor: pointer;
 	background: #424242;
 	border: 1px solid #262626;
@@ -237,6 +243,10 @@ input.button2:focus{
 }
 input.button2{
 	background: #034d91;
+}
+input.button1{
+	background: #34Bd61;
+	color: black;
 }
 
 p{
@@ -267,6 +277,22 @@ p{
   content: "";
   zoom: 1;
 }
+
+summary, select.sombre {
+	margin-top: 10px;
+	font-size: 125%;
+	font-weight: bold;
+	padding: 10px;
+	background-color: #373e4e; 
+	color: #f8e81c;
+	border-radius: 10px;
+}
+
+select.sombre {
+	background-color: #d8d0cf;
+	color: black;
+}
+
 .tabs:after, .pills:after {
   clear: both;
 }
@@ -718,6 +744,7 @@ div.stat_form {
 .sidebar_Projects_label{
 	margin-top: -15px;
 }
+
 .projects_selector{
 	margin:20px;
 	font-size: 14px;
@@ -901,9 +928,29 @@ td.project-user, th.project-user {
 	border-bottom: 1px solid #dddddd
 }
 .blue-box .issues li .comments{
+}
+.commentstate_0{
+	background: url('../images/layout/icon-comments_0.png')  0 1px no-repeat;
 	min-height: 14px;
 	float: right;
+	padding-left: 21px;
+	color: #949393;
+	margin: 9px 8px 0 0;
+	display: block;
+}
+.commentstate_1{
+	background: url('../images/layout/icon-comments_1.png')  0 1px no-repeat;
+	min-height: 14px;
+	float: right;
+	padding-left: 21px;
+	color: #949393;
+	margin: 9px 8px 0 0;
+	display: block;
+}
+.blue-box .issues li .comments{
 	background: url('../images/layout/icon-comments.png')  0 1px no-repeat;
+	min-height: 14px;
+	float: right;
 	padding-left: 21px;
 	color: #949393;
 	margin: 9px 8px 0 0;

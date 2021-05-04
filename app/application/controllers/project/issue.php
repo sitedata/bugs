@@ -1,9 +1,8 @@
 <?php
-
 class Project_Issue_Controller extends Base_Controller {
 
 	public $layout = 'layouts.project';
-	
+
 	public function __construct() {
 		parent::__construct();
 
@@ -40,32 +39,11 @@ class Project_Issue_Controller extends Base_Controller {
 				->with('notice-error', __('tinyissue.we_have_some_errors'));
 		}
 
-		//Send an email to the assignee
-		$val = explode("/",$issue['issue']->to());
-		$issue_num = $val[count($val)-1];
-		//Search for new assignee infos
-		$thisIssue = \Project\Issue::where('id', '=', $issue_num)->get('*');
-		$Who = \User::where('id', '=', $thisIssue[0]->attributes["assigned_to"] )->get(array('firstname','lastname','email'));
-		$WhoName = $Who[0]->attributes["firstname"].' '.$Who[0]->attributes["lastname"];
-		$WhoAddr = $Who[0]->attributes["email"];
-		$Issue_title = $thisIssue[0]->attributes["title"];
-		$Project = \Project::where('id', '=', $thisIssue[0]->attributes["project_id"])->get(array('id', 'name'));
-		$project_id = $Project[0]->attributes["id"];
-		$project_nm = $Project[0]->attributes["name"];
-		$project = \Project::find($project_id);
-		
-		//Email process
-			$header = "";
-			$subject  = sprintf(__('email.assignment'),$Issue_title,$project_nm);
-			$text  = sprintf(__('email.assignment'),$Issue_title,$project_nm);
-			$text .= "\n\n";
-			$text .= sprintf(__('email.assigned_by'),\Auth::user()->firstname." ".\Auth::user()->lastname);
-			$text .= "\n\n";
-			$text .= sprintf(__('tinyissue.priority')." : ".__('tinyissue.priority_desc_'.$thisIssue[0]->attributes["status"]));
-			$text .= "\n\n";
-			$text .= __('email.more_url').Project::current()->to('issue')."/".$issue_num."";
-			mail($WhoAddr, $subject,$text,$header);
-		//End of email process
+		//Automatically enrole assignee AND creator into following this issue
+		$followers =\DB::query("INSERT INTO following VALUES (NULL, ".Auth::user()->id.", ".Project::current()->id.", ".$issue['issue']->id.", 0, 1, 1)");
+
+		//Email to followers
+		$this->Courriel ('Project', true, Project::current()->id, 0, \Auth::user()->id, array('project'), array('tinyissue'));
 
 		return Redirect::to($issue['issue']->to())
 			->with('notice', __('tinyissue.issue_has_been_created'));
@@ -101,8 +79,12 @@ class Project_Issue_Controller extends Base_Controller {
 				->with('notice-error', __('tinyissue.you_put_no_comment'));
 		}
 		$comment = \Project\Issue\Comment::create_comment(Input::all(), Project::current(), Project\Issue::current());
+
+		//Email to followers
+		$this->Courriel ("Issue", true, Project::current()->id, Project\Issue::current()->id, \Auth::user()->id, array('comment'), array('tinyissue'));
+
 		return Redirect::to(Project\Issue::current()->to() . '#comment' . $comment->id)
-			->with('notice', __('tinyissue.your_comment_added'.((Input::get('status') == 0 || Input::get('Fermons') == 0) ? ' --- '.__('tinyissue.issue_has_been_closed') : '')));
+			->with('notice', __('tinyissue.your_comment_added').(((Input::get('status') == 0 || Input::get('Fermons') == 0) && \Auth::user()->role_id != 1) ? ' --- '.__('tinyissue.issue_has_been_closed') : ''));
 	}
 
 	/**
@@ -128,13 +110,16 @@ class Project_Issue_Controller extends Base_Controller {
 			$result .= ($Modif) ? "Succès" : "Échec";
 			if (\User\Activity::add(8, intval(Input::get('projetOld')), Input::get('ticketNum'), $NumNew, "From ".Input::get('projetOld')." to ".$NumNew )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
 
+			//Email to followers
+			$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issueproject'), array('tinyissue'));
+
 			return Redirect::to("project/".$NumNew."/issues?tag_id=1");
 
 		} else {
 			Asset::add('tag-it-js', '/app/assets/js/tag-it.min.js', array('jquery', 'jquery-ui'));
 			Asset::add('tag-it-css-base', '/app/assets/css/jquery.tagit.css');
 			Asset::add('tag-it-css-zendesk', '/app/assets/css/tagit.ui-zendesk.css');
-	
+
 			/* Get tags as string */
 			$issue_tags = '';
 			foreach(Project\Issue::current()->tags as $tag) {
@@ -145,10 +130,16 @@ class Project_Issue_Controller extends Base_Controller {
 				'issue_tags' => $issue_tags,
 				'project' => Project::current()
 			));
+
+			//Email to followers
+			$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('assigned'), array('tinyissue'));
 		}
 	}
 
+	/**Update an issue
+	*/
 	public function post_edit() {
+		$avant = Project\Issue::current()->title;
 		$update = Project\Issue::current()->update_issue(Input::all());
 
 		if(!$update['success']) {
@@ -157,6 +148,9 @@ class Project_Issue_Controller extends Base_Controller {
 				->with_errors($update['errors'])
 				->with('notice-error', __('tinyissue.we_have_some_errors'));
 		}
+
+		//Email to followers
+		$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issue', $avant), array('tinyissue', 'value'));
 
 		return Redirect::to(Project\Issue::current()->to())
 			->with('notice', __('tinyissue.issue_has_been_updated'));
@@ -198,10 +192,11 @@ class Project_Issue_Controller extends Base_Controller {
 	public function get_status() {
 		$status = Input::get('status', 0);
 
+		$message = __('tinyissue.issue_has_been_reopened');
+		$messagetit = __('tinyissue.issue_has_been_reopened');
 		if($status == 0) {
 			$message = __('tinyissue.issue_has_been_closed');
-		} else {
-			$message = __('tinyissue.issue_has_been_reopened');
+			$messagetit = __('tinyissue.issue_has_been_closed_tit');
 		}
 
 		Project\Issue::current()->change_status($status);
@@ -270,18 +265,17 @@ class Project_Issue_Controller extends Base_Controller {
 			$thisIssue = \Project\Issue::where('id', '=', Input::get('Issue'))->get('*');
 			$Issue_title = $thisIssue[0]->attributes["title"];
 			$Project = \Project::where('id', '=', $thisIssue[0]->attributes["project_id"])->get(array('id', 'name'));
-			$project_id = $Project[0]->attributes["id"];
-			$project_nm = $Project[0]->attributes["name"];
-			$project = \Project::find($project_id);
+			$project = \Project::find($Project[0]->attributes["id"]);
 
 			if ($Modif) {  //Send mail to the new assignee
-				$subject  = sprintf(__('email.reassignment'),$Issue_title,$project_nm);
-				$text  = sprintf(__('email.reassignment'),$Issue_title,$project_nm);
-				$text .= "\n\n";
-				$text .= sprintf(__('email.reassigned_by'),\Auth::user()->firstname." ".\Auth::user()->lastname);
-				$text .= "\n\n";
-				$text .= __('email.more_url').Project::current()->to('issue')."/".Input::get('Issue')."";
-				mail($WhoAddr, $subject,$text);
+				$text  = __('tinyissue.following_email_assigned').' « '.$thisIssue[0]->attributes["title"].' » ( '.__('tinyissue.on_project').' « '.$Project[0]->attributes["name"].' » )';
+				$text .= "<br /><br />";
+				$text .= __('email.reassigned_by').' '.\Auth::user()->firstname.' '.\Auth::user()->lastname.'.';
+				$text .= "<br />";
+				$text .= __('tinyissue.assigned_to').' '.$WhoName.'.';
+				$text .= "<br /><br />";
+				//$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, $text, __('tinyissue.following_email_assigned_tit'));
+				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('assigned', 'reassigned_by', 'reassigned_to', $WhoName), array('tinyissue', 'email', 'tinyissue', 'variable'));
 			}
 
 			//Show on screen what did just happened
@@ -317,12 +311,12 @@ class Project_Issue_Controller extends Base_Controller {
 			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','bgcolor'));
 			if (!isset($TagNum) || @$TagNum == '' ) { $Modif = false; $Quel = "xyzxyz"; }
 
-		
+
 			/**
 			 * Edit an issue
 			 * Adding a tag
 			 */
-			if ($Modif == 'AddOneTag' ) {  
+			if ($Modif == 'AddOneTag' ) {
 				$IssueTagNum = \DB::table('projects_issues_tags')->where('issue_id', '=', $Issue)->where('tag_id', '=', $TagNum->attributes['id'], 'AND' )->first(array('id'));
 				$now = date("Y-m-d H:i:s");
 				if ($IssueTagNum == NULL) {
@@ -333,21 +327,25 @@ class Project_Issue_Controller extends Base_Controller {
 				$Action = NULL;
 				$Msg = __('tinyissue.tag_added');
 				$Show = true;
+				//Email to followers --- tags have changed
+				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsADD'), array('tinyissue'));
 			}
 
 			/**
 			 * Edit an issue
 			 * Taking a tag off
 			 */
-			if ($Modif == 'eraseTag') {	
+			if ($Modif == 'eraseTag') {
 				$IssueTagNum =\DB::table('projects_issues_tags')->where('issue_id','=',$Issue)->where('tag_id','=',$TagNum->id,'AND')->first('id');
 				\DB::table('projects_issues_tags')->delete($IssueTagNum->id);
 				$Action = $Issue;
 				$Modif = true;
 				$Msg = '<span style="color:#F00;">'.__('tinyissue.tag_removed').'</span>';
 				$Show = true;
+				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsOTE'), array('tinyissue'));
 			}
-			
+
+
 			/**
 			 * Update database
 			 */
@@ -367,6 +365,7 @@ class Project_Issue_Controller extends Base_Controller {
 				$t = time();
 				$result = $content;
 			}
+
 		return $content;
 	}
 
@@ -378,7 +377,7 @@ class Project_Issue_Controller extends Base_Controller {
 	 *
 	 * @request ajax
 	 * @return string
-	 */ 
+	 */
 	public function post_upload() {
 		$pref = Config::get('application.attached');
 		$url =\URL::home();
@@ -390,7 +389,7 @@ class Project_Issue_Controller extends Base_Controller {
 		$rep = (substr($pref["directory"], 0, 1) == '/') ? $pref["directory"] : "../".$pref["directory"];
 
 		//Common data for the insertion into database: file's type, date, ect
-		if ($Issue == 1) {		
+		if ($Issue == 1) {
 			//Attach a file to a new issue
 			////We'll keep uploaded files in uploads/New/date directory until the issue will be created 
 			$Issue = 'New/'.$Qui;
@@ -442,14 +441,17 @@ class Project_Issue_Controller extends Base_Controller {
 			return 0;
 		}
 		//Forth step: Store it into database
-		if ($Issue != 'New/'.$Qui) {		
+		if ($Issue != 'New/'.$Qui) {
 			//Modifié le 23 juin 2019, retrait des  "../" imposés dans l'enregistrement de l'adresse
 			\DB::table('projects_issues_attachments')->insert(array('id'=>NULL,'issue_id'=>$Issue,'comment_id'=>$idComment,'uploaded_by'=>$Qui,'filesize'=>$TheFile["size"],'filename'=>str_replace("../", "", $rep).$fileName,'fileextension'=>$_GET["ext"],'upload_token'=>$TheFile["tmp_name"],'created_at'=>$now,'updated_at'=>$now) );
 			$Quel = \DB::table('projects_issues_attachments')->where('issue_id', '=', $Issue)->order_by('id','DESC')->get();
 			if (\User\Activity::add(7, $Project, $Issue, $Quel[0]->id, $fileName )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
 		}
-		
-		//Fifth: Show on user's desk
+
+		//Fifth step: Notice the followers
+		$this->Courriel ('Issue', true, Project::current()->id, $Issue, Auth::user()->id, array('attached'), array('tinyissue'));
+
+		//Sixth: Show on user's desk
 		if (is_numeric($msg)) {
 			$rep = (substr($rep, 0, 3) == '../') ? substr($rep, 3) : $rep;
 			$msg .= ';';
@@ -463,5 +465,9 @@ class Project_Issue_Controller extends Base_Controller {
 			$msg .= '</div></div></div>';
 		}
 		return $msg;
+	}
+
+	private function Courriel ($Type, $SkipUser, $ProjectID, $IssueID, $User, $contenu, $src) {
+		include_once "../app/application/controllers/ajax/SendMail.php";
 	}
 }
