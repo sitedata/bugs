@@ -134,7 +134,7 @@
 				}
 				$mail = new PHPMailer();
 				$mail->Mailer = $optMail['transport'];
-				$mail->SMTPDebug = 1;											// 0 = no output, 1 = errors and messages, 2 = messages only.
+				$mail->SMTPDebug = $optMail['mailerrormsg'];				// 0 = no output, 1 = errors and messages, 2 = messages only.
 				if (trim($optMail['smtp']['encryption']) != '') {
 					$mail->SMTPSecure = $optMail['smtp']['encryption'];// sets the prefix to the server
 				}

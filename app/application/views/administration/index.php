@@ -275,6 +275,12 @@ f<?php
 						<option value="Windows-1256" <?php echo ($Conf["encoding"] == 'Windows-1256') ? 'selected="selected"' : ''; ?> >Windows-1256</option>
 						<option value="Windows-1257" <?php echo ($Conf["encoding"] == 'Windows-1257') ? 'selected="selected"' : ''; ?> >Windows-1257</option>
 						<option value="Windows-1258" <?php echo ($Conf["encoding"] == 'Windows-1258') ? 'selected="selected"' : ''; ?> >Windows-1258</option>
+					</select> <br />
+				<?php echo $LngSRV["Email_mailerrormsg"]; ?> : 
+					<select name="email_mailerrormsg" id="input_email_mailerrormsg" onchange="this.style.backgroundColor = 'yellow';">
+						<option value="0"	<?php echo ($Conf["mailerrormsg"] == '0') ? 'selected="selected"' : ''; ?> ><?php echo $LngSRV["Email_mailerrormsg_0"]; ?></option>
+						<option value="1"	<?php echo ($Conf["mailerrormsg"] == '1') ? 'selected="selected"' : ''; ?> ><?php echo $LngSRV["Email_mailerrormsg_1"]; ?></option>
+						<option value="2"	<?php echo ($Conf["mailerrormsg"] == '2') ? 'selected="selected"' : ''; ?> ><?php echo $LngSRV["Email_mailerrormsg_2"]; ?></option>
 					</select>
 					<br /><br />
 				<?php echo $LngSRV["Email_linelenght"]; ?> : <input name="email_linelenght" id="input_email_linelenght" type="number" max="1000" min="25" size="6" value="<?php echo $Conf["linelenght"]; ?>" onchange="this.style.backgroundColor = 'yellow';" /><br /><br />
