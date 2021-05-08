@@ -30,7 +30,7 @@
 	$IssueID = $IssueID ?? 0;
 
 	//Titre et corps du message selon les configurations choisies par l'administrateur
-	$message = "";
+	$message  = (file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $config['mail']['intro']; 
 	if (is_array(@$contenu)) {
 		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.$contenu[0].'_tit'];
 		foreach ($contenu as $ind => $val) {
@@ -44,9 +44,12 @@
 				}
 			}
 		}
+	} else if ($Type == 'TestonsSVP') {
+		$message .= $Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
 	} else {
 		$message = @$contenu;
 	}
+	$message .= (file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $config['mail']['bye']; 
 	$subject = $subject ?? 'BUGS';
 
 		//Select email addresses
@@ -57,9 +60,6 @@
 	} else if ($Type == 'TestonsSVP') {
 		$query  = "SELECT DISTINCT 0 AS project, 1 AS attached, 1 AS tages, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, 'Testing mail for any project' AS name, 'Test' AS title ";
 		$query .= "FROM users AS USR WHERE USR.id = ".$UserID;
-		$message  = (file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $config['mail']['intro']; 
-		$message .= $Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
-		$message .= (file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $config['mail']['bye']; 
 		$subject = $Lng['tinyissue']["email_test_tit"];
 		echo $Lng['tinyissue']["email_test_tit"];
 	} else {
@@ -110,37 +110,34 @@
 				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
 				mail($follower["email"], $subject, $body, $headers);
 			} else {
-				$mail = new PHPMailer();
-				$mail->Mailer = $optMail['transport'];
 				switch ($optMail['transport']) {
-						//Please submit your code
-						//On March 14th, 2017 I had no time to go further on these different types ( case 'PHP', 'sendmail', 'gmail', 'POP3' ) 
 					case 'PHP':
-						require_once  'application/libraries/PHPmailer/class.phpmailer.php';
+						require_once  $prefixe.'application/libraries/PHPmailer/class.phpmailer.php';
 						break;
 					case 'sendmail':
-						require_once '/application/libraries/PHPmailer/class.phpmaileroauth.php';
+						require_once $prefixe.'/application/libraries/PHPmailer/class.phpmaileroauth.php';
 						break;
 					case 'gmail':
-						require_once '/application/libraries/PHPmailer/class.phpmaileroauthgoogle.php';
+						require_once $prefixe.'/application/libraries/PHPmailer/class.phpmaileroauthgoogle.php';
 						break;
 					case 'POP3':
-						require_once '/application/libraries/PHPmailer/class.pop3.php';
+						require_once $prefixe.'/application/libraries/PHPmailer/class.pop3.php';
 						break;
 					default:																		//smtp is the second default value after "mail" which has its own code up
-						require_once '/application/libraries/PHPmailer/class.smtp.php';
-						$mail->SMTPDebug = 1;												// 0 = no output, 1 = errors and messages, 2 = messages only.
-						if ($optMail['smtp']['encryption'] == '') {
-						} else {
-							$mail->SMTPAuth = true;											// enable SMTP authentication
-							$mail->SMTPSecure = $optMail['smtp']['encryption'];	// sets the prefix to the server
-							$mail->Host = $optMail['smtp']['server'];
-							$mail->Port = $optMail['smtp']['port'];
-							$mail->Username = $optMail['smtp']['username'];
-							$mail->Password = $optMail['smtp']['password'];
-						}
+						require_once $prefixe.'/application/libraries/PHPmailer/class.smtp.php';
 						break;
 				}
+				$mail = new PHPMailer();
+				$mail->Mailer = $optMail['transport'];
+				$mail->SMTPDebug = 1;												// 0 = no output, 1 = errors and messages, 2 = messages only.
+				if ($optMail['smtp']['encryption'] != '') {
+					$mail->SMTPSecure = $optMail['smtp']['encryption'];	// sets the prefix to the server
+				}
+				$mail->SMTPAuth = true;											// enable SMTP authentication
+				$mail->Host = $optMail['smtp']['server'];
+				$mail->Port = $optMail['smtp']['port'];
+				$mail->Username = $optMail['smtp']['username'];
+				$mail->Password = $optMail['smtp']['password'];
 
 				$mail->CharSet = $optMail['encoding'] ?? 'windows-1250';
 				$mail->SetFrom ($optMail['from']['email'], $optMail['from']['name']);
