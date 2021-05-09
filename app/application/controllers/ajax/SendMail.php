@@ -173,6 +173,14 @@
 function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strrpos($link, "/"));
+	$body = str_replace('%60', "", $body);
+	$body = str_replace('``', "", $body);
+	$body = str_replace('http:/', "http://", $body);
+	$body = str_replace('https:/', "https://", $body);
+	$body = str_replace('http:////', "http://", $body);
+	$body = str_replace('https:////', "https://", $body);
+	$body = str_replace('http:///', "http://", $body);
+	$body = str_replace('https:///', "https://", $body);
 	$body = str_replace('{first}', ucwords($follower["first"]), $body);
 	$body = str_replace('{last}', ucwords($follower["last"]), $body);
 	$body = str_replace('{full}', ucwords($follower["user"]), $body);
