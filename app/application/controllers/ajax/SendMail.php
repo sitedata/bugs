@@ -172,7 +172,7 @@
 	
 function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	global $prefixe;
-	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$link = (isset($_SERVER['HTTPS']) && @$_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strrpos($link, "/"));
 	$body = str_replace('src="uploads/', 'src="'.$prefixe.'uploads/', $body);
 	$body = str_replace('%60', "", $body);
@@ -183,8 +183,8 @@ function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$body = str_replace('https:////', 'https://', $body);
 	$body = str_replace('http:///', 'http://', $body);
 	$body = str_replace('https:///', 'https://', $body);
-	if ( $_SERVER['SERVER_NAME'] != "127.0.0.1"  && 'SERVER_NAME'] != "localhost"  ) {
-		$body = str_replace('src="', 'src="'.((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 's' : '').'://'.$_SERVER['SERVER_NAME'].'/', $body);
+	if ( $_SERVER['SERVER_NAME'] != "127.0.0.1"  && $_SERVER['SERVER_NAME'] != "localhost"  ) {
+		$body = str_replace('src="', 'src="'.((isset($_SERVER['HTTPS']) && @$_SERVER['HTTPS'] === 'on') ? 's' : '').'://'.$_SERVER['SERVER_NAME'].'/', $body);
 	}
 	$body = str_replace('{first}', ucwords($follower["first"]), $body);
 	$body = str_replace('{last}', ucwords($follower["last"]), $body);
