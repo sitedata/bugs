@@ -176,7 +176,7 @@ function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$link = substr($link, 0, strrpos($link, "/"));
 	$body = str_replace('src="uploads/', 'src="'.$prefixe.'uploads/', $body);
 	$body = str_replace('%60', "", $body);
-	$body = str_replace('``', "", $body);
+	$body = str_replace('``', '"', $body);
 	$body = str_replace('http:/', 'http://', $body);
 	$body = str_replace('https:/', 'https://', $body);
 	$body = str_replace('http:////', 'http://', $body);
