@@ -6,7 +6,6 @@
 	$Type = isset($_GET["Type"]) ? $_GET["Type"] : 'Issue';
 	$Type = isset($Type) ? $Type : $Type;
 	$UserID = 1;
-//	$UserID = isset(Auth::user()->id) ? Auth::user()->id : $UserID;
 	$UserID = isset($_GET["User"]) ? $_GET["User"] : $UserID;
 	$UserID = isset($User) ? $User : $UserID;
 
@@ -189,7 +188,17 @@ function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$body = str_replace('{first}', ucwords($follower["first"]), $body);
 	$body = str_replace('{last}', ucwords($follower["last"]), $body);
 	$body = str_replace('{full}', ucwords($follower["user"]), $body);
+	$body = str_replace('{First}', ucwords($follower["first"]), $body);
+	$body = str_replace('{Last}', ucwords($follower["last"]), $body);
+	$body = str_replace('{Full}', ucwords($follower["user"]), $body);
+	$body = str_replace('{projet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
 	$body = str_replace('{project}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{projets}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{projects}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{Projet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{Project}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{Projets}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{Projects}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
 	$body = str_replace('{issue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
 	return $body;
 }
