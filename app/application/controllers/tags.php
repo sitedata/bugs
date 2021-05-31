@@ -34,7 +34,8 @@ class Tags_Controller extends Base_Controller {
 	public function post_new() {
 		$rules = array(
 			'tag' => 'unique:tags|required|max:255',
-			'bgcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i')
+			'bgcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i'),
+			'ftcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i')
 		);
 
 		$input = Input::all();
@@ -44,6 +45,7 @@ class Tags_Controller extends Base_Controller {
 			$tag = new Tag;
 			$tag->tag = $input['tag'];
 			$tag->bgcolor = $input['bgcolor'];
+			$tag->ftcolor = $input['ftcolor'];
 			$tag->save();
 			
 			return Redirect::to('tags')
@@ -77,7 +79,8 @@ class Tags_Controller extends Base_Controller {
 
 		$rules = array(
 			'tag' => 'unique:tags,tag,' . $tag_id . '|required|max:255',
-			'bgcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i')
+			'bgcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i'),
+			'ftcolor' => array('max:50', 'match:/^#(?:[0-9a-f]+)$/i')
 		);
 
 		$input = Input::all();
@@ -87,6 +90,7 @@ class Tags_Controller extends Base_Controller {
 		if ($validator->passes()) {
 			$tag->tag = $input['tag'];
 			$tag->bgcolor = $input['bgcolor'];
+			$tag->ftcolor = $input['ftcolor'];
 			$tag->save();
 			
 			return Redirect::to('tags')

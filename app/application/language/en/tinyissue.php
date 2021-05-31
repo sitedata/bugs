@@ -260,6 +260,8 @@ return array(
 	'tag_update' => 'tag update',
 	'tag' => 'Tag',
 	'tags_added' => 'tags added',
+	'tags_bgcolor' => 'Background',
+	'tags_ftcolor' => 'Font color',
 	'tags_removed' => 'tags removed',
 	'tags' => 'Tags',
 	'thisproject_details' => 'This project specs',
