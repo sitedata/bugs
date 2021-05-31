@@ -99,7 +99,7 @@
 		$IssueTags = array();
 		if(!empty($issue->tags)) {
 			foreach($issue->tags()->order_by('tag', 'ASC')->get() as $tag) {
-			echo '<label class="label" style="'.($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').($tag->ftcolor ? 'color: '.$tag->ftcolor . ';' : ''). '>' . $tag->tag . '"></label>&nbsp;';
+			echo '<label class="label" style="'.($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').($tag->ftcolor ? 'color: '.$tag->ftcolor . ';' : ''). '">' . $tag->tag . '"></label>&nbsp;';
 			$IssueTags[] = $tag->tag;
 			}  //endforeach
 		} //endif
