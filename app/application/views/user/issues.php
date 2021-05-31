@@ -24,7 +24,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 					<?php if(!empty($row->tags)): ?>
 					<div class="tags">
 						<?php foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag): ?>
-						<?php echo '<label class="label"' . ($tag->bgcolor ? ' style="background: ' . $tag->bgcolor . '"' : '') . '>' . $tag->tag . '</label>'; ?>
+						<?php echo '<label class="label" style="'.($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').($tag->ftcolor ? 'color: '.$tag->ftcolor . ';' : '').'>' . $tag->tag . '</label>'; ?>
 						<?php endforeach; ?>
 					</div>
 					<?php endif; ?>

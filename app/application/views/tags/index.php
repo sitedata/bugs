@@ -5,7 +5,7 @@
 <div class="pad">
 
 	<?php foreach($tags as $tag): ?>
-		<?php echo '<a href="' . URL::to('tag/' . $tag->id . '/edit') . '"><label id="tag' . $tag->id . '" class="label"' . ($tag->bgcolor ? ' style="background: ' . $tag->bgcolor . '"' : '') . '>' . $tag->tag . '</label></a>'; ?><br /><br />
+		<?php echo '<a href="' . URL::to('tag/' . $tag->id . '/edit') . '"><label id="tag' . $tag->id . '" class="label" style="' . ($tag->bgcolor ? ' background-color: ' . $tag->bgcolor.';' : '') . ($tag->ftcolor ? ' color: ' . $tag->ftcolor . ';' : '') . '">' . $tag->tag . '</label></a>'; ?><br /><br />
 	<?php endforeach; ?>
 	
 	<br />

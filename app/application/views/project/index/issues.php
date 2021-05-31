@@ -76,7 +76,7 @@ if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
 				if(!empty($row->tags)) {
 					echo '<div class="tags">';
 					foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag) {
-						echo '<label class="label"' . ($tag->bgcolor ? ' style="background: ' . $tag->bgcolor . '"' : '') . '>' . $tag->tag . '</label>';
+						echo '<label class="label" style="'.($tag->bgcolor ? ' background-color: ' . $tag->bgcolor . ';' : '').($tag->ftcolor ? ' color: ' . $tag->ftcolor . ';' : '').'">' . $tag->tag . '</label>';
 					}
 					echo '</div>';
 				} 
