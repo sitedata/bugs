@@ -94,7 +94,7 @@ class Issue extends \Eloquent {
 			switch($row->type_id) {
 				case 2:
 					//using project/issue/activity/comment.php
-						//according to db table activity, field activity's value for id = 2
+					//according to db table activity, field activity's value for id = 2
 					$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
 						'issue' => $issue,
 						'project' => $project,
@@ -131,13 +131,18 @@ class Issue extends \Eloquent {
 					//using project/issue/activity/update-issue-tags.php
 					//according to db table activity, field activity's value for id = 6 
 					$tag_diff = json_decode($row->data, true);
-					$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
-						'issue' => $issue,
-						'project' => $project,
-						'user' => $users[$row->user_id],
-						'tag_diff' => $tag_diff,
-						'activity' => $row
-					));
+					if (isset($tag_diff["tag_data"])) {
+						$tag_info = \DB::table('tags')->where('id', '=', $tag_diff["tag_data"][8]["id"])->get();
+						$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
+							'issue' => $issue,
+							'project' => $project,
+							'user' => $users[$row->user_id],
+							'tag_diff' => $tag_diff,
+							'bgcolor' => $tag_info[0]->bgcolor,
+							'ftcolor' => $tag_info[0]->ftcolor,
+							'activity' => $row
+						));
+					}
 					break;
 				case 8:
 					//using project/issue/activity/ChangeIssue-project.php
@@ -401,8 +406,7 @@ class Issue extends \Eloquent {
 			foreach($tag_data_resource as $tag) {
 				$tag_data[$tag->id] = $tag->to_array();
 			}
-
-			\User\Activity::add(6, $this->project_id, $this->id, null, json_encode(array('added_tags' => $added_tags, 'removed_tags' => $removed_tags, 'tag_data' => $tag_data)));
+			\User\Activity::add(6, $this->project_id, $this->id, null, json_encode(array('added_tags' => $added_tags, 'removed_tags' => $removed_tags, 'tag_data' => $tag_data, 'tags_test' => 'Baboom en poudre')));
 		}
 	}
 
