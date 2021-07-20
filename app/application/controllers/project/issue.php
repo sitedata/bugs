@@ -471,3 +471,4 @@ class Project_Issue_Controller extends Base_Controller {
 		include_once "../app/application/controllers/ajax/SendMail.php";
 	}
 }
+

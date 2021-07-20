@@ -459,7 +459,6 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 	xhttpASGMT.open("GET", NextPage, true);
 	xhttpASGMT.send(); 
 }
-
 <?php
 	$wysiwyg = Config::get('application.editor');
 	if (trim(@$wysiwyg['directory']) != '') {
