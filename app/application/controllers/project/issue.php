@@ -356,7 +356,7 @@ class Project_Issue_Controller extends Base_Controller {
 			 */
 			if (isset($TagNum) && $Quel != "xyzxyz") {
 				$content .= '<div class="insides"><div class="topbar"><div class="data">';
-				$content .= '<label style="background-color: '.$TagNum->attributes['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">';
+				$content .= '<label style="background-color: '.$TagNum->attributes['bgcolor'].'; color:'.$TagNum->attributes['ftcolor'].' padding: 5px 10px; border-radius: 8px;">';
 				$content .= $TagNum->attributes['tag'].'</label>';
 				$content .= ' : <b>'.$Msg.'</b> ';
 				$content .= __('tinyissue.by') . ' ';
