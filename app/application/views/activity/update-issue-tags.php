@@ -8,7 +8,7 @@
 		<div class="tag-activity">
 			<?php if($tag_counts['added'] > 0): ?>
 			<?php foreach($tag_diff['added_tags'] as $tag): ?>
-				<?php echo '<label class="label"' . ($tag_diff['tag_data'][$tag]['bgcolor'] ? ' style="color: '.$tag_diff['tag_data'][$tag]['ftcolor'].'; background: '.$tag_diff['tag_data'][$tag]['bgcolor'].';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; ?>
+				<?php echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="color: '.$tag_diff['tag_data'][$tag]['ftcolor'].'; background-color: '.$tag_diff['tag_data'][$tag]['bgcolor'].';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; ?>
 			<?php endforeach; ?>
 			<?php echo __($tag_counts['added'] > 1 ? 'tinyissue.tags_added' : 'tinyissue.tag_added'); ?>
 			<?php echo __('tinyissue.in'); ?>
@@ -21,7 +21,7 @@
 
 			<?php if($tag_counts['removed'] > 0): ?>
 			<?php foreach($tag_diff['removed_tags'] as $tag): ?>
-				<?php echo '<label class="label"' . ($tag_diff['tag_data'][$tag]['bgcolor'] ? ' style="float: none; background: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . '"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; ?>
+				<?php echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="float: none; color: ' . $tag_diff['tag_data'][$tag]['ftcolor'] . '; background-color: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . ';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; ?>
 			<?php endforeach; ?>
 			<?php echo __($tag_counts['removed'] > 1 ? 'tinyissue.tags_removed' : 'tinyissue.tag_removed'); ?>
 			<?php echo __('tinyissue.in'); ?>
