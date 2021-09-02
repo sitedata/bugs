@@ -132,17 +132,21 @@ class Issue extends \Eloquent {
 					//according to db table activity, field activity's value for id = 6 
 					$tag_diff = json_decode($row->data, true);
 					if (isset($tag_diff["tag_data"])) {
-						$tag_info = \DB::table('tags')->where('id', '=', $tag_diff["tag_data"][8]["id"])->get();
-						//2 sept 2021 insistance sur ce document.
-						$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
-							'issue' => $issue,
-							'project' => $project,
-							'user' => $users[$row->user_id],
-							'tag_diff' => $tag_diff,
-							'bgcolor' => $tag_info[0]->bgcolor,
-							'ftcolor' => $tag_info[0]->ftcolor,
-							'activity' => $row
-						));
+						//2 sept 2021 : pourquoi les changements de tags n'intègrenent pas toute l'information nécessaire dans la table activity ? 
+						//ci-bas, une ligne pour contourner le problème en attendant de trouver la solution
+						if (isset($tag_diff["tag_data"][8])) {
+							$tag_info = \DB::table('tags')->where('id', '=', $tag_diff["tag_data"][8]["id"])->get();
+							//2 sept 2021 insistance sur ce document.
+							$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
+								'issue' => $issue,
+								'project' => $project,
+								'user' => $users[$row->user_id],
+								'tag_diff' => $tag_diff,
+								'bgcolor' => $tag_info[0]->bgcolor,
+								'ftcolor' => $tag_info[0]->ftcolor,
+								'activity' => $row
+							));
+						}
 					}
 					break;
 				case 8:
