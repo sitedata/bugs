@@ -99,7 +99,9 @@
 		$IssueTags = array();
 		if(!empty($issue->tags)) {
 			foreach($issue->tags()->order_by('tag', 'ASC')->get() as $tag) {
-			echo '<label class="label" style="background-color: '.$tag->bgcolor.';color: '.$tag->ftcolor . ';">' . $tag->tag . '</label>&nbsp;';
+			//2 sept 2021 : la ligne suivante a été remplacée temporairement par l'autre suit afin de déboguer un appel de ftcolor
+			//echo '<label class="label" style="background-color: '.$tag->bgcolor.';color: '.$tag->ftcolor . ';">' . $tag->tag . '</label>&nbsp;';
+			echo '<label class="label" style="background-color: '.$tag->bgcolor.';color: black;">' . $tag->tag . '</label>&nbsp;';
 			$IssueTags[] = $tag->tag;
 			}  //endforeach
 		} //endif

@@ -16,7 +16,6 @@
 			</tr>
 			<tr>
 				<th style="width: 10%"><?php echo __('tinyissue.tags_ftcolor'); ?></th>
-<<<<<<< ours
 				<td>
 					<input type="text" id="ftcolor" name="ftcolor" style="width: 98%;" value="<?php echo Input::old('ftcolor', 'purple'); ?>" />
 
@@ -31,22 +30,6 @@
 			<tr>
 				<th style="width: 10%"><?php echo __('tinyissue.tags_bgcolor'); ?></th>
 				<td>
-=======
-				<td>
-					<input type="text" id="ftcolor" name="ftcolor" style="width: 98%;" value="<?php echo Input::old('ftcolor', 'purple'); ?>" />
-
-					<?php echo $errors->first('ftcolor', '<span class="error">:message</span>'); ?>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<span id="span_exemple" style="border-radius: 7pt; font-weight:bold; padding: 9px; background-color: purple; color: white;">Exemple<br /></span>
-				</td>
-			</tr>
-			<tr>
-				<th style="width: 10%"><?php echo __('tinyissue.tags_bgcolor'); ?></th>
-				<td>
->>>>>>> theirs
 					<input type="text" id="bgcolor" name="bgcolor" style="width: 98%;" value="<?php echo Input::old('bgcolor', 'purple'); ?>" />
 
 					<?php echo $errors->first('bgcolor', '<span class="error">:message</span>'); ?>

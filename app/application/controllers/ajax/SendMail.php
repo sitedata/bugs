@@ -174,11 +174,31 @@
 function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strrpos($link, "/"));
+	$body = str_replace('{frst}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firt}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firs}', ucwords($follower["first"]), $body);
 	$body = str_replace('{first}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firsts}', ucwords($follower["first"]), $body);
+	$body = str_replace('{lst}', ucwords($follower["last"]), $body);
+	$body = str_replace('{lat}', ucwords($follower["last"]), $body);
+	$body = str_replace('{las}', ucwords($follower["last"]), $body);
 	$body = str_replace('{last}', ucwords($follower["last"]), $body);
+	$body = str_replace('{lasts}', ucwords($follower["last"]), $body);
+	$body = str_replace('{ful}', ucwords($follower["user"]), $body);
+	$body = str_replace('{fll}', ucwords($follower["user"]), $body);
 	$body = str_replace('{full}', ucwords($follower["user"]), $body);
+	$body = str_replace('{fulls}', ucwords($follower["user"]), $body);
+	$body = str_replace('{pjet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{prjet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{projet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{projets}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{prject}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
 	$body = str_replace('{project}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{projects}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
+	$body = str_replace('{issu}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
+	$body = str_replace('{isue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
 	$body = str_replace('{issue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
+	$body = str_replace('{issues}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
 	return $body;
 }
 ?>
