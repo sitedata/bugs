@@ -261,7 +261,7 @@ return array(
 	'tag' => 'Tag',
 	'tags_added' => 'tags added',
 	'tags_bgcolor' => 'Background',
-	'tags_ftcolor' => 'Font color',
+	'tags_ftcolor' => 'Font color for tag',
 	'tags_removed' => 'tags removed',
 	'tags' => 'Tags',
 	'thisproject_details' => 'This project specs',
