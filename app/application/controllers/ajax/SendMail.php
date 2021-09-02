@@ -63,7 +63,11 @@
 		$subject = $Lng['tinyissue']["email_test_tit"];
 		echo $Lng['tinyissue']["email_test_tit"];
 	} else {
-		$query  = "SELECT DISTINCT FAL.project, FAL.attached, FAL.tags, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, PRO.name, TIK.title ";
+		$query  = "SELECT DISTINCT FAL.project, FAL.attached, FAL.tags, ";
+		$query .= "		USR.email, USR.firstname AS first, ";
+		$query .= "		USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, ";
+		$query .= "		PRO.name, ";
+		$query .= "	(SELECT title FROM projects_issues WHERE id = ".@$IssueID.") AS title ";
 		$query .= "FROM following AS FAL ";
 		$query .= "LEFT JOIN users AS USR ON USR.id = FAL.user_id "; 
 		$query .= "LEFT JOIN projects AS PRO ON PRO.id = FAL.project_id ";
