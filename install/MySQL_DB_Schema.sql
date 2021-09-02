@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
 CREATE TABLE `tags` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tag` varchar(255) NOT NULL,
-  `bgcolor` varchar(50) DEFAULT '#003300',
+  `bgcolor` varchar(50) DEFAULT '#330033',
   `ftcolor` varchar(50) DEFAULT '#FFFFFF',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,

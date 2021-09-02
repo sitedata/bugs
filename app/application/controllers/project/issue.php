@@ -43,7 +43,7 @@ class Project_Issue_Controller extends Base_Controller {
 		$followers =\DB::query("INSERT INTO following VALUES (NULL, ".Auth::user()->id.", ".Project::current()->id.", ".$issue['issue']->id.", 0, 1, 1)");
 
 		//Email to followers
-		$this->Courriel ('Project', true, Project::current()->id, 0, \Auth::user()->id, array('project'), array('tinyissue'));
+		$this->Courriel ('Project', true, Project::current()->id, $issue['issue']->id, \Auth::user()->id, array('project'), array('tinyissue'));
 
 		return Redirect::to($issue['issue']->to())
 			->with('notice', __('tinyissue.issue_has_been_created'));
@@ -308,7 +308,7 @@ class Project_Issue_Controller extends Base_Controller {
 
 			$Modif = (Input::get('Modif') !== NULL) ? Input::get('Modif') :  false;
 			$Quel = (Input::get('Quel')  !== NULL ) ? Input::get('Quel') : "xyzxyz";
-			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','bgcolor','ftcolor'));
+			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','bgcolor'));
 			if (!isset($TagNum) || @$TagNum == '' ) { $Modif = false; $Quel = "xyzxyz"; }
 
 
@@ -356,7 +356,7 @@ class Project_Issue_Controller extends Base_Controller {
 			 */
 			if (isset($TagNum) && $Quel != "xyzxyz") {
 				$content .= '<div class="insides"><div class="topbar"><div class="data">';
-				$content .= '<label style="background-color: '.$TagNum->attributes['bgcolor'].'; color: '.$TagNum->attributes['ftcolor'].'; padding: 5px 10px; border-radius: 8px;">';
+				$content .= '<label style="background-color: '.$TagNum->attributes['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">';
 				$content .= $TagNum->attributes['tag'].'</label>';
 				$content .= ' : <b>'.$Msg.'</b> ';
 				$content .= __('tinyissue.by') . ' ';
@@ -451,7 +451,7 @@ class Project_Issue_Controller extends Base_Controller {
 		//Fifth step: Notice the followers
 		$this->Courriel ('Issue', true, Project::current()->id, $Issue, Auth::user()->id, array('attached'), array('tinyissue'));
 
-		//Sixth: Show on user's desk
+		//Sixth step: Show on user's desk
 		if (is_numeric($msg)) {
 			$rep = (substr($rep, 0, 3) == '../') ? substr($rep, 3) : $rep;
 			$msg .= ';';
@@ -471,4 +471,3 @@ class Project_Issue_Controller extends Base_Controller {
 		include_once "../app/application/controllers/ajax/SendMail.php";
 	}
 }
-
