@@ -39,7 +39,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 							<?php echo Time::age(strtotime($row->created_at)); ?>
 
 							<?php if(!is_null($row->updated_by)): ?>
-							- <?php echo __('tinyissue.updated_by'); ?> <strong><?php echo $row->updated->firstname . ' ' . $row->updated->lastname; ?></strong>
+							- <?php echo __('tinyissue.updated_by'); ?>&nbsp;&nbsp;<strong><?php echo $row->updated->firstname . ' ' . $row->updated->lastname; ?></strong>
 							<?php echo Time::age(strtotime($row->updated_at)); ?>
 							<?php endif; ?>
 						</div>
