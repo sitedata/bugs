@@ -9,7 +9,7 @@
 				if($tag_counts['added'] > 0) {
 					foreach($tag_diff['added_tags'] as $tag) { 
 						//2 sept 2021 recherche d'un bogue lié à ftcolor
-						echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="color: '.($tag_diff['tag_data'][$tag]['ftcolor'] ? $tag_diff['tag_data'][$tag]['ftcolor'] : 'black').'; background-color: '.$tag_diff['tag_data'][$tag]['bgcolor'].';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
+						echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="color: '.($tag_diff['tag_data'][$tag]['ftcolor'] ? $tag_diff['tag_data'][$tag]['ftcolor'] : 'black').'; background-color: '.$tag_diff['tag_data'][$tag]['bgcolor'].';' : '') . '">' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 						//echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="color: '.$tag_diff['tag_data'][$tag]['ftcolor'].'; background-color: '.$tag_diff['tag_data'][$tag]['bgcolor'].';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 						//echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="background-color: '.$tag_diff['tag_data'][$tag]['bgcolor'].';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 					} 
@@ -25,7 +25,7 @@
 			if($tag_counts['removed'] > 0) {
 				foreach($tag_diff['removed_tags'] as $tag) { 
 					//2 sept 2021 recherche d'un bogue lié à ftcolor
-					echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="float: none; color: ' . ($tag_diff['tag_data'][$tag]['ftcolor'] ? $tag_diff['tag_data'][$tag]['ftcolor'] : 'black') . '; background-color: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . ';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
+					echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="float: none; color: ' . ($tag_diff['tag_data'][$tag]['ftcolor'] ? $tag_diff['tag_data'][$tag]['ftcolor'] : 'black') . '; background-color: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . ';' : '') . '">' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 					//echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="float: none; color: ' . $tag_diff['tag_data'][$tag]['ftcolor'] . '; background-color: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . ';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 					//echo '<label class="label"' . (isset($tag_diff['tag_data'][$tag]['bgcolor']) ? ' style="float: none; background-color: ' . $tag_diff['tag_data'][$tag]['bgcolor'] . ';"' : '') . '>' . $tag_diff['tag_data'][$tag]['tag'] . '</label>'; 
 				}
