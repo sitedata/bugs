@@ -25,8 +25,9 @@
 						foreach ($j['tag_data'] as $ind => $val ) { 
 							$tag_info = \DB::table('tags')->where('id', '=', $val["id"])->get();
 						//2 sept 2021 recherche d'un bogue lié à ftcolor
-//							if ( in_array($val['id'], $j['added_tags'])) { echo '<label style="background-color: '.$tag_info[0]->bgcolor.'; color: '.$tag_info[0]->ftcolor.'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
-							if ( in_array($val['id'], $j['added_tags'])) { echo '<label style="background-color: '.$tag_info[0]->bgcolor.'; color: black; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
+							if ( in_array($val['id'], $j['added_tags'])) { echo '<label style="background-color: '.$tag_info[0]->bgcolor.'; '.($tag_info[0]->ftcolor ? 'color: '.$tag_info[0]->ftcolor.'; ' : '').' padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
+							//if ( in_array($val['id'], $j['added_tags'])) { echo '<label style="background-color: '.$tag_info[0]->bgcolor.'; color: '.$tag_info[0]->ftcolor.'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
+							//if ( in_array($val['id'], $j['added_tags'])) { echo '<label style="background-color: '.$tag_info[0]->bgcolor.'; color: black; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
 						}
 						echo '<br clear="all" />';
 						echo '<br clear="all" />';

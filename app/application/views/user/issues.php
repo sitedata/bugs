@@ -25,7 +25,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 					<div class="tags">
 						<?php foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag): ?>
 						//2 sept 2021 recherche d'un bogue lié à ftcolor
-						<?php echo '<label class="label" style="'.($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').'>' . $tag->tag . '</label>'; ?>
+						<?php echo '<label class="label" style="'.($tag->ftcolor ? 'color: '.$tag->ftcolor . ';' : '').($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').'>' . $tag->tag . '</label>'; ?>
 						<?php endforeach; ?>
 					</div>
 					<?php endif; ?>
