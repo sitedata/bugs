@@ -260,6 +260,8 @@ return array(
 	'tag_update' => 'étiquette changée',
 	'tag' => 'Étiquette',
 	'tags_added' => 'étiquettes ajoutées',
+	'tags_bgcolor' => 'Couleur de fond',
+	'tags_ftcolor' => 'Couleur de police de ceci',
 	'tags_removed' => 'étiquettes retirées',
 	'tags' => 'Étiquettes',
 	'thisproject_members' => 'Détails du projet',

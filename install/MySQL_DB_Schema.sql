@@ -158,7 +158,8 @@ CREATE TABLE IF NOT EXISTS `settings` (
 CREATE TABLE `tags` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tag` varchar(255) NOT NULL,
-  `bgcolor` varchar(50) DEFAULT NULL,
+  `bgcolor` varchar(50) DEFAULT '#330033',
+  `ftcolor` varchar(50) DEFAULT '#FFFFFF',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -290,19 +291,20 @@ VALUES
 	(6,'Updated issue tags','update-issue-tags'),
 	(7,'Attached a file to issue','attached-file'),
 	(8,'Move an issue from project A to project B',	'ChangeIssue-project'),
-	(9,'User starts or stop following issue or project', 'Follow');
+	(9,'User starts or stop following issue or project', 'Follow'),
+	(10, 'Updated an issue', 'IssueEdit');
 #--
 
 #--#Create default tags : id 9
 INSERT INTO `tags` (`id`, `tag`, `bgcolor`, `created_at`, `updated_at`) VALUES
-(1,	'status:open',		'#c43c35',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(2,	'status:closed',	'#46A546',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(3,	'type:feature',	'#62cffc',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(4,	'type:bug',		'#f89406',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(6,	'resolution:won`t fix','#812323',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(7,	'resolution:fixed',	'#048383',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
-(8,	'status:testing',	'#FCC307',	'2013-11-30 11:23:01',	'2016-11-30 23:11:01'),
-(9,	'status:inProgress','#FF6600',	'2016-11-10 23:12:01',	'2016-11-10 23:12:01');
+(1,	'status:open',		'#c43c35',		'#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(2,	'status:closed',	'#46A546',		'#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(3,	'type:feature',	'#62cffc',		'#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(4,	'type:bug',			'#f89406',		'#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(6,	'resolution:won`t fix','#812323','#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(7,	'resolution:fixed',	'#048383',	'#FFFFFF',	'2013-11-30 11:23:01',	'2013-11-30 11:23:01'),
+(8,	'status:testing',	'#FCC307',		'#FFFFFF',	'2013-11-30 11:23:01',	'2016-11-30 23:11:01'),
+(9,	'status:inProgress','#FF6600',	'#FFFFFF',	'2016-11-10 23:12:01',	'2016-11-10 23:12:01')
 #--
 
 #--#Import open/closed states
@@ -313,9 +315,6 @@ INSERT INTO projects_issues_tags (issue_id, tag_id, created_at, updated_at)
 );
 #--
 
-#--#Ccreate activity type for tag update
-INSERT INTO `activity` (`id`, `description`, `activity`)
-VALUES ('6', 'Updated issue tags', 'update-issue-tags');
 #----- Last line of this file .... Anything bellow this line will be lost. -----
 
 #--#Create a first admin user:
