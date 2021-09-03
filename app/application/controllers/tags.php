@@ -45,7 +45,7 @@ class Tags_Controller extends Base_Controller {
 			$tag = new Tag;
 			$tag->tag = $input['tag'];
 			$tag->bgcolor = strtoupper($input['bgcolor']);
-			$tag->ftcolor = strtoupper($input['ftcolor']);
+			$tag->ftcolor = strtoupper(@$input['ftcolor']);
 			$tag->save();
 			
 			return Redirect::to('tags')
@@ -90,7 +90,7 @@ class Tags_Controller extends Base_Controller {
 		if ($validator->passes()) {
 			$tag->tag = $input['tag'];
 			$tag->bgcolor = strtoupper($input['bgcolor']);
-			$tag->ftcolor = strtoupper($input['ftcolor']);
+			$tag->ftcolor = strtoupper(@$input['ftcolor']);
 			$tag->save();
 			
 			return Redirect::to('tags')
