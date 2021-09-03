@@ -31,7 +31,9 @@
 		echo '			<a href="project/'.$id.'">'.$NomProjet[$id].'</a>';
 		echo '		</h4>';
 		echo '		<ul class="activity">';
-		foreach($actiProj[$id] as $activity) { echo $activity; }
+		foreach($actiProj[$id] as $activity) {
+			echo $activity; 
+			}
 		echo '		</ul>';
 		echo '		<a href="project/'.$id.'">'.$NomProjet[$id].'</a>';
 		echo '	</div>';
