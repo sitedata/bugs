@@ -34,8 +34,9 @@
 						echo count($j['removed_tags']).' '.((count($j['removed_tags']) > 1) ? __('tinyissue.tags_removed') : __('tinyissue.tag_removed')).'.';
 						foreach ($j['tag_data'] as $ind => $val ) { 
 						//2 sept 2021 recherche d'un bogue lié à ftcolor
+							if ( in_array($val['id'], $j['removed_tags'])) { echo '<label style="'.( $val['ftcolor'] ? 'color: '.$val['ftcolor'] : '').'; background-color: '.$val['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
 							//if ( in_array($val['id'], $j['removed_tags'])) { echo '<label style="-color: '.$val['ftcolor'].'; background-color: '.$val['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
-							if ( in_array($val['id'], $j['removed_tags'])) { echo '<label style="-color: '.@$val['ftcolor'].'; background-color: '.$val['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
+							//if ( in_array($val['id'], $j['removed_tags'])) { echo '<label style="-color: '.@$val['ftcolor'].'; background-color: '.$val['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">'.$val['tag'].'</label>'; } 
 						}
 						echo '<br clear="all" />';
 						echo ' '.date(Config::get('application.my_bugs_app.date_format'), strtotime($activity->attributes['updated_at']));

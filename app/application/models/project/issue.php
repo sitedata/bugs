@@ -256,13 +256,8 @@ class Issue extends \Eloquent {
 
 			/* Update tags */
 			$tag_ids[2] = 2;
-			if(isset($tag_ids[1])) {
-				unset($tag_ids[1]);
-			}
-
-			if(isset($tag_ids[8])) {
-				unset($tag_ids[8]);
-			}
+			if(isset($tag_ids[1])) { unset($tag_ids[1]); }
+			if(isset($tag_ids[8])) { unset($tag_ids[8]); }
 
 			/* Add to activity log */
 			\User\Activity::add(3, $this->project_id, $this->id);
