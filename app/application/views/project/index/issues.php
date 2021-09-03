@@ -89,7 +89,7 @@ if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
 					echo '<a href="'.$row->to().'">'.$row->title.'</a>';
 					echo '<div class="info">';
 					echo __('tinyissue.created_by'); 
-					echo '<strong>'.$row->user->firstname . ' ' . $row->user->lastname.'</strong>';
+					echo '&nbsp;&nbsp;<strong>'.$row->user->firstname . ' ' . $row->user->lastname.'</strong>';
 					if(is_null($row->updated_by)) { echo Time::age(strtotime($row->created_at)); }
 					if(!is_null($row->updated_by)) {  
 						echo ' - '.__('tinyissue.updated_by');
@@ -98,7 +98,7 @@ if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
 					} 
 					if($row->assigned_to != 0) {
 						echo ' - '.__('tinyissue.assigned_to'); 
-						echo '<strong>'.$row->assigned->firstname . ' ' . $row->assigned->lastname.'</strong>';
+						echo '&nbsp;&nbsp;<strong>'.$row->assigned->firstname . ' ' . $row->assigned->lastname.'</strong>';
 					} 
 					echo '</div>';
 

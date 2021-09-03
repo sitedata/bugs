@@ -34,7 +34,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 					<div class="data">
 						<a href="<?php echo $row->to(); ?>"><?php echo $row->title; ?></a>
 						<div class="info">
-							<?php echo __('tinyissue.created_by'); ?>
+							<?php echo __('tinyissue.created_by'); ?>&nbsp;&nbsp;
 							<strong><?php echo $row->user->firstname . ' ' . $row->user->lastname; ?></strong>
 							<?php echo Time::age(strtotime($row->created_at)); ?>
 
