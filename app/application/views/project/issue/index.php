@@ -302,11 +302,11 @@ function AddTag (Quel,d) {
 	var Modif = "AddOneTag";
 	var IDcomment = 'comment' + new Date().getTime();
 	var xhttpTAG = new XMLHttpRequest();
+	var NextPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
 	//var NextPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
-	//var NextPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
-	var NextPage = '<?php echo $url.substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], 'project')); ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
+	//var NextPage = '<?php echo $url.substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], 'project')); ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
 	//var NextPage = '<?php echo substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], 'project')); ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
-	alert("Nous entrons ici en AddTag --- c'est la ligne 308 avec NextPage = " + NextPage);
+	//alert("Nous entrons ici en AddTag --- c'est la ligne 308 avec NextPage = " + NextPage);
 	xhttpTAG.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
 		if (xhttpTAG.responseText != '' ) {
