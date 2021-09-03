@@ -143,7 +143,7 @@ class Issue extends \Eloquent {
 								'user' => $users[$row->user_id],
 								'tag_diff' => $tag_diff,
 								'bgcolor' => $tag_info[0]->bgcolor,
-								'ftcolor' => $tag_info[0]->ftcolor,
+								'ftcolor' => ($tag_info[0]->ftcolor ? $tag_info[0]->ftcolor : 'black'),
 								'activity' => $row
 							));
 						}
