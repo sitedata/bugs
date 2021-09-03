@@ -328,7 +328,9 @@ class Project_Issue_Controller extends Base_Controller {
 				$Msg = __('tinyissue.tag_added');
 				$Show = true;
 				//Email to followers --- tags have changed
-				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsADD'), array('tinyissue'));
+		//Il y a une erreur 500 dans la page Courriel.  Serait-ce un problème de chargement de la page ? Est-ce une virgule, un élément manquant ? 
+		//		$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsADD'), array('tinyissue'));
+		//return "Baboom atomique ligne 332, après courriel;  Msg = ".$Msg." <<<<<";
 			}
 
 			/**
