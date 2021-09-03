@@ -77,8 +77,9 @@ if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
 					echo '<div class="tags">';
 					foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag) {
 						//2 sept 2021 recherche d'un bogue lié à ftcolor
+						echo '<label class="label" style="'.($tag->bgcolor ? ' background-color: ' . $tag->bgcolor . ';' : '').($tag->ftcolor ? ' color: ' . $tag->ftcolor . ';' : '').'">' . $tag->tag . '</label>';
 						//echo '<label class="label" style="'.($tag->bgcolor ? ' background-color: ' . $tag->bgcolor . ';' : '').($tag->ftcolor ? ' color: ' . $tag->ftcolor . ';' : '').'">' . $tag->tag . '</label>';
-						echo '<label class="label" style="'.($tag->bgcolor ? ' background-color: ' . $tag->bgcolor . ';' : '').'">' . $tag->tag . '</label>';
+						//echo '<label class="label" style="'.($tag->bgcolor ? ' background-color: ' . $tag->bgcolor . ';' : '').'">' . $tag->tag . '</label>';
 					}
 					echo '</div>';
 				} 

@@ -105,11 +105,11 @@
 				$body .= '--'.$boundary.''.$passage_ligne;
 				$body .= 'Content-Type: text/html; charset="'.$optMail['encoding'].'"'.$passage_ligne;
 				$body .= $passage_ligne;
-				$body .= '<p>'.$optMail['intro'].'</p>';
+				$body .= '<p>'.((file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $optMail['intro']).'</p>';
 				$body .= $passage_ligne;
 				$body .= '<p>'.$message.'</p>';
 				$body .= $passage_ligne;
-				$body .= '<p>'.$optMail['bye'].'</p>';
+				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
 				$body .= $passage_ligne.'';
 				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
 				mail($follower["email"], $subject, $body, $headers);
@@ -150,11 +150,11 @@
 				$mail->SetFrom ($optMail['from']['email'], $optMail['from']['name']);
 				$mail->Subject = $subject;
 				$mail->ContentType = $optMail['plainHTML'] ?? 'text/plain';
-				$body  = $optMail['intro'];
+				$body .= '<p>'.((file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $optMail['intro']).'</p>'; 
 				$body .= '<br /><br />';
 				$body .= $message;
 				$body .= '<br /><br />';
-				$body .= $optMail['bye'];
+				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
 				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
 				if ($mail->ContentType == 'html') {
 					$mail->IsHTML(true);
