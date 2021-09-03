@@ -85,7 +85,7 @@
 
 	if (Nombre($followers) > 0) {
 		while ($follower = Fetche($followers)) {
-			$subject = wildcards($subject, $follower,$ProjectID, $IssueID);
+			$subject = wildcards($subject, $follower,$ProjectID, $IssueID, true);
 			$passage_ligne = (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $follower["email"])) ? "\r\n" : "\n";
 			$message = str_replace('"', "``", $message);
 			$message = stripslashes($message);
@@ -171,9 +171,12 @@
 		}
 	}
 	
-function wildcards ($body, $follower,$ProjectID, $IssueID) {
+function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
 	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strrpos($link, "/"));
+	$lfin = $tit ? '' : '</a>';
+	$liss = $tit ? '' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">';
+	$lpro = $tit ? '' : '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">';
 	$body = str_replace('{frst}', ucwords($follower["first"]), $body);
 	$body = str_replace('{firt}', ucwords($follower["first"]), $body);
 	$body = str_replace('{firs}', ucwords($follower["first"]), $body);
@@ -188,17 +191,17 @@ function wildcards ($body, $follower,$ProjectID, $IssueID) {
 	$body = str_replace('{fll}', ucwords($follower["user"]), $body);
 	$body = str_replace('{full}', ucwords($follower["user"]), $body);
 	$body = str_replace('{fulls}', ucwords($follower["user"]), $body);
-	$body = str_replace('{pjet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{prjet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{projet}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{projets}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{prject}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{project}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{projects}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{issu}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
-	$body = str_replace('{isue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
-	$body = str_replace('{issue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
-	$body = str_replace('{issues}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
+	$body = str_replace('{pjet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{prjet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projets}', $lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{prject}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{project}', $lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projects}',$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{issu}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{isue}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{issue}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{issues}',	$liss.$follower["title"].$lfin, $body);
 	return $body;
 }
 ?>

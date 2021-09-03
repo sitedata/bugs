@@ -35,9 +35,7 @@
 			</h4>
 
 			<ul class="activity">
-				<?php foreach($actiProj[$id] as $activity): ?>
-				<?php echo $activity; ?>
-				<?php endforeach; ?>
+				<?php foreach($actiProj[$id] as $activity) { echo $activity; } ?>
 			</ul>
 
 			<a href="project/<?php echo $id; ?>"><?php echo $NomProjet[$id]; ?></a>
