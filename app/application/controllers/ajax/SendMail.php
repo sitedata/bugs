@@ -35,7 +35,7 @@
 		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.$contenu[0].'_tit'];
 		foreach ($contenu as $ind => $val) {
 			if ($src[$ind] == 'value') {
-				$message .= $val;
+				$message .= '<i>'.$val.'</i>';
 			} else {
 				if (file_exists($dir.$val.'.html')) {
 					$message .= file_get_contents($dir.$val.'.html');
