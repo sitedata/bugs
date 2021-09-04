@@ -11,7 +11,7 @@ if (!Project\User::MbrProj(\Auth::user()->id, Project::current()->id)) {
 			<form method="get" action="">
 				<div class="filter-and-sorting_TAGS">
 					<div style="position: absolute; left: 0; width: 10%; font-weight: bold; text-align: right; top: 13px;">
-						<b><?php echo __('tinyissue.tags'); ?></b>
+						<b><?php echo __('tinyissue.tags'); ?></b><br /><span style="font-weight: lighter;">Joker : % *</span>
 					</div>
 					<div style="position: absolute; left: 11%; width: 85%;">
 							<?php echo Form::text('tags', Input::get('tags', ''), array('id' => 'tags')); ?>

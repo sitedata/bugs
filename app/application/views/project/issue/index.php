@@ -226,7 +226,7 @@
 				<div style="text-align: right; width: 98%; margin-top: -25px;"><br /><br /></div>
 			<?php  if (Auth::user()->role_id != 1) { ?>
 					<!-- Tags modification  -->
-					<span style="float:left; font-weight: bold; margin: 7px;"><?php echo  __('tinyissue.tags'); ?></span>
+					<span style="float:left; font-weight: bold; margin: 7px;"><?php echo  __('tinyissue.tags'); ?><br /><span style="font-weight: lighter;">Joker : % *</span></span>
 					<div style="width: 73%; float: left">
 						<?php
 							$TAGS = new Project_Issue_Controller();
