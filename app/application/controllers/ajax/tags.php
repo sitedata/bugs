@@ -6,6 +6,7 @@ class Ajax_Tags_Controller extends Base_Controller {
 		$retval = array();
 
 		$term = Input::get('term', '');
+		$term = (in_array($term, array("*"))) ? '%' : $term;
 		if ($term) {
 			$tags = Tag::where('tag', 'LIKE', '%' . $term . '%')->get();
 			foreach ($tags as $tag) {
