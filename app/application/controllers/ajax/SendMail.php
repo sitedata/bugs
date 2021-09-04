@@ -174,8 +174,8 @@ function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
 	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strpos($link, "?"));
 	$link = substr($link, 0, strrpos($link, "/"));
-	$IssueID = substr($IssueID, 0, strpos($IssueID, "?"));
-	$IssueID = substr($IssueID, 0, strrpos($IssueID, "/"));
+//	$IssueID = substr($IssueID, 0, strpos($IssueID, "?"));
+//	$IssueID = substr($IssueID, 0, strrpos($IssueID, "/"));
 	$lfin = $tit ? ' »' : '</a>';
 	$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">';
 	$lpro = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">';
