@@ -37,11 +37,12 @@
 			if ($src[$ind] == 'value') {
 				$message .= '<i>'.$val.'</i>';
 			} else {
-				if (file_exists($dir.$val.'.html')) {
-					$message .= file_get_contents($dir.$val.'.html');
-				} else {
-					$message .= $Lng[$src[$ind]]['following_email_'.$val];
-				}
+				$message .= (file_exists($dir.$val.'.html')) ? file_get_contents($dir.$val.'.html') : $Lng[$src[$ind]]['following_email_'.$val];
+//				if (file_exists($dir.$val.'.html')) {
+//					$message .= file_get_contents($dir.$val.'.html');
+//				} else {
+//					$message .= $Lng[$src[$ind]]['following_email_'.$val];
+//				}
 			}
 		}
 	} else {
@@ -57,9 +58,7 @@
 	} else if ($Type == 'TestonsSVP') {
 		$query  = "SELECT DISTINCT 0 AS project, 1 AS attached, 1 AS tages, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, 'Testing mail for any project' AS name, 'Test' AS title ";
 		$query .= "FROM users AS USR WHERE USR.id = ".$UserID;
-//		$message  = (file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $config['mail']['intro']; 
 		$message .= $Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
-//		$message .= (file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $config['mail']['bye']; 
 		$subject = $Lng['tinyissue']["email_test_tit"];
 		echo $Lng['tinyissue']["email_test_tit"];
 	} else {
@@ -172,8 +171,11 @@
 	}
 	
 function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
-	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$link = substr($link, 0, strpos($link, "?"));
 	$link = substr($link, 0, strrpos($link, "/"));
+	$IssueID = substr($IssueID, 0, strpos($IssueID, "?"));
+	$IssueID = substr($IssueID, 0, strrpos($IssueID, "/"));
 	$lfin = $tit ? ' »' : '</a>';
 	$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">';
 	$lpro = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">';
