@@ -71,7 +71,6 @@
 				echo '</div>';
 			}
 	
-			//Time's going fast!
 			//Timing bar, according to the time planified (field projects_issues - duration) for this issue
 			////Calculations
 			$config_app = require path('public') . 'config.app.php';
@@ -99,7 +98,9 @@
 		$IssueTags = array();
 		if(!empty($issue->tags)) {
 			foreach($issue->tags()->order_by('tag', 'ASC')->get() as $tag) {
-			echo '<label class="label"' . ($tag->bgcolor ? ' style="background: ' . $tag->bgcolor . '"' : '') . '>' . $tag->tag . '</label>&nbsp;';
+			//2 sept 2021 : la ligne suivante a été remplacée temporairement par l'autre suit afin de déboguer un appel de ftcolor
+			echo '<label class="label" style="background-color: '.$tag->bgcolor.';'.($tag->ftcolor ? 'color: '.$tag->ftcolor.'; ' : '').'">' . $tag->tag . '</label>&nbsp;';
+			//echo '<label class="label" style="background-color: '.$tag->bgcolor.';color: '.((isset($tag->ftcolor)) ? $tag->ftcolor : 'black') . ';">' . $tag->tag . '</label>&nbsp;';
 			$IssueTags[] = $tag->tag;
 			}  //endforeach
 		} //endif
@@ -120,7 +121,7 @@
 				</div>
 
 				<ul class="attachments">
-					<?php foreach($issue->attachments()->get() as $attachment): ?>
+					<?php foreach($issue->attachments()->get() as $attachment) { ?>
 					<li>
 						<?php if(in_array($attachment->fileextension, Config::get('application.image_extensions'))): ?>
 							<a href="<?php echo \URL::home() . Config::get('application.attachment_path') . '/' . rawurlencode($attachment->filename); ?>" title="<?php echo $attachment->filename; ?>"><img src="<?php echo \URL::home() . Config::get('application.attachment_path') . $project->id . '/' . $attachment->upload_token . '/' . $attachment->filename; ?>" style="max-width: 100px;"  alt="<?php echo $attachment->filename; ?>" /></a>
@@ -128,7 +129,7 @@
 							<a href="<?php echo \URL::home() . Config::get('application.attachment_path') . '/' . rawurlencode($attachment->filename); ?>" title="<?php echo $attachment->filename; ?>"><?php echo \URL::home().$attachment->filename; ?></a>
 						<?php endif; ?>
 					</li>
-					<?php endforeach; ?>
+					<?php } ?>
 				</ul>
 
 				<div class="clr"></div>
@@ -301,8 +302,10 @@ function AddTag (Quel,d) {
 	var Modif = "AddOneTag";
 	var IDcomment = 'comment' + new Date().getTime();
 	var xhttpTAG = new XMLHttpRequest();
-	var NextPage = '<?php echo $_SERVER['REQUEST_URI']; ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
+	var NextPage = '<?php echo $url.substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], 'project')); ?>/retag?Modif=' + Modif + '&Quel=' + Quel;
+//	alert("Nous entrons ici en AddTag --- c'est la ligne 308 avec NextPage = " + NextPage);
 	xhttpTAG.onreadystatechange = function() {
+//	alert("Voici " + this.readyState + " && " + this.status);
 	if (this.readyState == 4 && this.status == 200) {
 		if (xhttpTAG.responseText != '' ) {
 				var adLi = document.createElement("LI");
@@ -459,7 +462,6 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 	xhttpASGMT.open("GET", NextPage, true);
 	xhttpASGMT.send(); 
 }
-
 <?php
 	$wysiwyg = Config::get('application.editor');
 	if (trim(@$wysiwyg['directory']) != '') {

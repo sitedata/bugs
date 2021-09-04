@@ -88,18 +88,13 @@ class Issue extends \Eloquent {
 			}
 		}
 
-
-
-
 		/* Loop through the projects and activity again, building the views for each activity */
 		$return = array();
-
-
 		foreach($activities as $row) {
 			switch($row->type_id) {
 				case 2:
 					//using project/issue/activity/comment.php
-						//according to db table activity, field activity's value for id = 2
+					//according to db table activity, field activity's value for id = 2
 					$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
 						'issue' => $issue,
 						'project' => $project,
@@ -136,13 +131,23 @@ class Issue extends \Eloquent {
 					//using project/issue/activity/update-issue-tags.php
 					//according to db table activity, field activity's value for id = 6 
 					$tag_diff = json_decode($row->data, true);
-					$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
-						'issue' => $issue,
-						'project' => $project,
-						'user' => $users[$row->user_id],
-						'tag_diff' => $tag_diff,
-						'activity' => $row
-					));
+					if (isset($tag_diff["tag_data"])) {
+						//2 sept 2021 : pourquoi les changements de tags n'intègrenent pas toute l'information nécessaire dans la table activity ? 
+						//ci-bas, une ligne pour contourner le problème en attendant de trouver la solution
+						if (isset($tag_diff["tag_data"][8])) {
+							$tag_info = \DB::table('tags')->where('id', '=', $tag_diff["tag_data"][8]["id"])->get();
+							//2 sept 2021 insistance sur ce document.
+							$return[] = \View::make('project/issue/activity/' . $activity_type[$row->type_id]->activity, array(
+								'issue' => $issue,
+								'project' => $project,
+								'user' => $users[$row->user_id],
+								'tag_diff' => $tag_diff,
+								'bgcolor' => $tag_info[0]->bgcolor,
+								'ftcolor' => ($tag_info[0]->ftcolor ? $tag_info[0]->ftcolor : 'black'),
+								'activity' => $row
+							));
+						}
+					}
 					break;
 				case 8:
 					//using project/issue/activity/ChangeIssue-project.php
@@ -218,36 +223,11 @@ class Issue extends \Eloquent {
 	* @return void
 	*/
 	public function reassign($user_id) {
-//		$text  = __('tinyissue.following_email_assigned_a');
-//		$text .= __('tinyissue.following_email_assigned_b');
-//		$text .= __('tinyissue.following_email_assigned_c');
 		$old_assignee = $this->assigned_to;
 
 		$this->assigned_to = $user_id;
 		$this->save();
 
-		/* Notify the person being assigned to unless that person is doing the actual assignment */
-/*		if($this->assigned_to && $this->assigned_to != \Auth::user()->id) {
-			$project_id = $this->project_id;
-			$project = \Project::find($project_id);
-
-			$subject = sprintf(__('email.reassignment'),$this->title,$project->name);
-			$text = \View::make('email.reassigned_issue', array(
-				'actor' => \Auth::user()->firstname . ' ' . \Auth::user()->lastname,
-				'project' => $project,
-				'issue' => $this
-			));
-
-			\Mail::send_email($text, $this->assigned->email, $subject);
-		}
-
-		//Notify all followers about the change of assignation
-		$followers =\DB::query("SELECT USR.email, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, TIK.title FROM following AS FAL LEFT JOIN users AS USR ON USR.id = FAL.user_id LEFT JOIN projects_issues TIK ON TIK.id = FAL.issue_id WHERE FAL.project_id = ".$project->id." AND FAL.project = 0 AND FAL.issue_id = ".$this->id." ");
-		foreach ($followers as $ind => $follower) { 
-			\Mail::send_mail(__('tinyissue.following_email_comment')." « ".$follower->title." ».", $follower->email, __('tinyissue.following_email_comment_tit'));
-			//mail($follower->email, __('tinyissue.following_email_assigned_tit'), __('tinyissue.following_email_assigned')." « ".$follower->title." ».");
-		} 
-*/
 		//Notify all followers about the new status
 		$text .= __('tinyissue.following_email_assigned');
 		$this->Courriel ('Issue', true, \Project::current()->id, $this->id, \Auth::user()->id, array('assigned'), array('tinyissue'));
@@ -263,7 +243,6 @@ class Issue extends \Eloquent {
 	* @return void
 	*/
 	public function change_status($status) {
-//		$text = __('tinyissue.following_email_status');
 		/* Retrieve all tags */
 		$tags = $this->tags;
 		$tag_ids = array();
@@ -277,13 +256,8 @@ class Issue extends \Eloquent {
 
 			/* Update tags */
 			$tag_ids[2] = 2;
-			if(isset($tag_ids[1])) {
-				unset($tag_ids[1]);
-			}
-
-			if(isset($tag_ids[8])) {
-				unset($tag_ids[8]);
-			}
+			if(isset($tag_ids[1])) { unset($tag_ids[1]); }
+			if(isset($tag_ids[8])) { unset($tag_ids[8]); }
 
 			/* Add to activity log */
 			\User\Activity::add(3, $this->project_id, $this->id);
@@ -432,8 +406,7 @@ class Issue extends \Eloquent {
 			foreach($tag_data_resource as $tag) {
 				$tag_data[$tag->id] = $tag->to_array();
 			}
-
-			\User\Activity::add(6, $this->project_id, $this->id, null, json_encode(array('added_tags' => $added_tags, 'removed_tags' => $removed_tags, 'tag_data' => $tag_data)));
+			\User\Activity::add(6, $this->project_id, $this->id, null, json_encode(array('added_tags' => $added_tags, 'removed_tags' => $removed_tags, 'tag_data' => $tag_data, 'tags_test' => 'Baboom en poudre')));
 		}
 	}
 

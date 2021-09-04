@@ -308,7 +308,7 @@ class Project_Issue_Controller extends Base_Controller {
 
 			$Modif = (Input::get('Modif') !== NULL) ? Input::get('Modif') :  false;
 			$Quel = (Input::get('Quel')  !== NULL ) ? Input::get('Quel') : "xyzxyz";
-			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','bgcolor'));
+			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','bgcolor','ftcolor'));
 			if (!isset($TagNum) || @$TagNum == '' ) { $Modif = false; $Quel = "xyzxyz"; }
 
 
@@ -328,7 +328,10 @@ class Project_Issue_Controller extends Base_Controller {
 				$Msg = __('tinyissue.tag_added');
 				$Show = true;
 				//Email to followers --- tags have changed
+				//2 sept 2021 : désactivé en vue de trouver une solution
 				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsADD'), array('tinyissue'));
+				$added_tags = '"added_tags":['.$TagNum->attributes['id'].'],';
+				$removed_tags = '"removed_tags":[],';
 			}
 
 			/**
@@ -342,21 +345,24 @@ class Project_Issue_Controller extends Base_Controller {
 				$Modif = true;
 				$Msg = '<span style="color:#F00;">'.__('tinyissue.tag_removed').'</span>';
 				$Show = true;
+				//2 sept 2021 : désactivé en vue de trouver une solution
 				$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsOTE'), array('tinyissue'));
+				$added_tags = '"added_tags":[],';
+				$removed_tags = '"removed_tags":['.$TagNum->attributes['id'].'],';
 			}
 
 
 			/**
 			 * Update database
 			 */
-			if ($Show) { \User\Activity::add(6, $Action, $Issue, $TagNum->attributes['id'] ); }
+			if ($Show) { \User\Activity::add(6, 5, $Issue, NULL, '{'.$added_tags.$removed_tags.'"tag_data":{"'.$TagNum->attributes['id'].'":{"id":'.$TagNum->attributes['id'].',"tag":"'.$TagNum->attributes['tag'].'","bgcolor":"'.$TagNum->attributes['bgcolor'].'","ftcolor":"'.$TagNum->attributes['ftcolor'].'"}},"tags_test":"Baboom en poudre"}' ); }
 
 			/**
 			 * Show on screen what just happened
 			 */
 			if (isset($TagNum) && $Quel != "xyzxyz") {
 				$content .= '<div class="insides"><div class="topbar"><div class="data">';
-				$content .= '<label style="background-color: '.$TagNum->attributes['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">';
+				$content .= '<label style="color: '.$TagNum->attributes['ftcolor'].'; background-color: '.$TagNum->attributes['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">';
 				$content .= $TagNum->attributes['tag'].'</label>';
 				$content .= ' : <b>'.$Msg.'</b> ';
 				$content .= __('tinyissue.by') . ' ';

@@ -1,5 +1,4 @@
 <li onclick="window.location='<?php echo $issue->to(); ?>';">
-
 	<div class="tag">
 		<label class="label warning"><?php echo __('tinyissue.tag_has_been_updated'); ?></label>
 	</div>
