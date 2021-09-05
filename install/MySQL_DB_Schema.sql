@@ -101,7 +101,7 @@ CREATE TABLE `projects_links` (
   `desactivated` date DEFAULT NULL,
   PRIMARY KEY (`id_link`),
   KEY `id_project_category_desactivated_created` (`id_project`,`category`,`desactivated`,`created`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #--
 
 #--#Create Projects Users Table
@@ -212,18 +212,18 @@ CREATE TABLE IF NOT EXISTS `users_activity` (
 #--
 
 #--Create the update history system table
-CREATE TABLE `update_history` (
+CREATE TABLE IF NOT EXISTS `update_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `Footprint` varchar(25) DEFAULT NULL,
   `Description` varchar(100) DEFAULT NULL,
   `DteRelease` datetime DEFAULT NULL,
   `DteInstall` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #--
 
 #--Create following table - this permits to user to receive email on ticket's activity
-CREATE TABLE `following` (
+CREATE TABLE IF NOT EXISTS `following` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
@@ -232,7 +232,7 @@ CREATE TABLE `following` (
   `attached` tinyint(2) NOT NULL DEFAULT 1,
   `tags` tinyint(2) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #--
 
 #--#Insert Permisions Data
@@ -313,7 +313,6 @@ INSERT INTO projects_issues_tags (issue_id, tag_id, created_at, updated_at)
 	SELECT id as issue_id, IF(status = 1, 1, 2) as tag_id, NOW(), NOW()
 	FROM projects_issues
 );
-#--
 
 #----- Last line of this file .... Anything bellow this line will be lost. -----
 
