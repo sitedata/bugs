@@ -196,6 +196,30 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #--
 
+#--#Create update_history table
+CREATE TABLE IF NOT EXISTS `update_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `Footprint` varchar(25) DEFAULT NULL,
+  `Description` varchar(100) DEFAULT NULL,
+  `DteRelease` datetime DEFAULT NULL,
+  `DteInstall` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#--
+
+#--#Create following table
+CREATE TABLE IF NOT EXISTS `following` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `issue_id` int(11) NOT NULL,
+  `project` tinyint(2) NOT NULL DEFAULT 0,
+  `attached` tinyint(2) NOT NULL DEFAULT 1,
+  `tags` tinyint(2) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+#--
+
 #--#Create Users Activity Table
 CREATE TABLE IF NOT EXISTS `users_activity` (
   `id` bigint(20) unsigned NOT NULL auto_increment,
@@ -211,29 +235,6 @@ CREATE TABLE IF NOT EXISTS `users_activity` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 #--
 
-#--Create the update history system table
-CREATE TABLE IF NOT EXISTS `update_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Footprint` varchar(25) DEFAULT NULL,
-  `Description` varchar(100) DEFAULT NULL,
-  `DteRelease` datetime DEFAULT NULL,
-  `DteInstall` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-#--
-
-#--Create following table - this permits to user to receive email on ticket's activity
-CREATE TABLE IF NOT EXISTS `following` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `issue_id` int(11) NOT NULL,
-  `project` tinyint(2) NOT NULL DEFAULT 0,
-  `attached` tinyint(2) NOT NULL DEFAULT 1,
-  `tags` tinyint(2) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-#--
 
 #--#Insert Permisions Data
 INSERT IGNORE INTO `permissions` (`id`, `permission`, `description`, `auto_has`) VALUES
