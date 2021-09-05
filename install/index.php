@@ -77,7 +77,7 @@ if($database_check) {
 						foreach ($requirement_check as $key => $value) { echo ' - '.$value.'<br />'; }
 						die();
 					}
-					if($database_check['error']) {
+					if(@$database_check['error']) {
 						echo $MyLng['Database_check'].$database_check['error'];
 						die();
 					}
