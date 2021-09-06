@@ -2,7 +2,7 @@
 	include_once "db.php";
 
 	//Préférences de l'usager
-	if (@$_GET["contenu"] == 'tagsADD' || @$_GET["contenu"] == 'tagsOTE') { $contenu[] = $_GET["contenu"]; $src[] = $_GET["src"]; } 
+	if (@$_GET["contenu"] == 'tagsADD' || @$_GET["contenu"] == 'tagsOTE' || @$_GET["contenu"] == 'assigned') { $contenu[] = $_GET["contenu"]; $src[] = $_GET["src"]; } 
 	//if (@$_GET["contenu"] == 'contenutagsADD') { $contenu[] = $_GET["contenu"]; } 
 	$contenu = $contenu ?? $_GET["contenu"] ?? "comment";
 	$dir = $prefixe.$config['attached']['directory'];
@@ -60,7 +60,7 @@
 	} else if ($Type == 'TestonsSVP') {
 		$query  = "SELECT DISTINCT 0 AS project, 1 AS attached, 1 AS tages, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, 'Testing mail for any project' AS name, 'Test' AS title ";
 		$query .= "FROM users AS USR WHERE USR.id = ".$UserID;
-		$message .= $Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
+		$message .= " ".$Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
 		$subject = $Lng['tinyissue']["email_test_tit"];
 		echo $Lng['tinyissue']["email_test_tit"];
 	} else {

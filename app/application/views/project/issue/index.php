@@ -485,6 +485,18 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 	};
 	xhttpASGMT.open("GET", NextPage, true);
 	xhttpASGMT.send(); 
+
+	var xhttpMAIL = new XMLHttpRequest();
+	var NextPage = path + "SendMail.php?Type=Issue&SkipUser=true&ProjectID=<?php echo Project::current()->id; ?>&IssueID=<?php echo Project\Issue::current()->id; ?>&User=<?php echo Auth::user()->id; ?>&contenu=assigned&src=tinyissue";
+	xhttpMAIL.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (xhttpMAIL.responseText != '' ) {
+				alert("Courriels envoyés avec retour = \n" + this.responseText);
+			}
+		}
+	};
+	xhttpMAIL.open("GET", NextPage, true);
+	xhttpMAIL.send(); 
 }
 <?php
 	$wysiwyg = Config::get('application.editor');
