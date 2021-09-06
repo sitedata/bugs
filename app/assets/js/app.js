@@ -3,14 +3,10 @@ $(function(){
    if($('.global-notice').html().length > 0){
 
    	$('.global-notice').slideDown();
+		
+   	setTimeout(function(){  $('.global-notice').slideUp(); }, 7500);
 
-   	setTimeout(function(){
-   		$('.global-notice').slideUp();
-   	}, 7500);
-
-   	$('.global-notice').live('click', function(){
-   		$('.global-notice').slideUp();
-   	});
+   	$('.global-notice').live('click', function(){ $('.global-notice').slideUp(); });
    }
 });
 
