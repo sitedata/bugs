@@ -1,8 +1,15 @@
 <?php
 	include_once "db.php";
+
 	//Préférences de l'usager
+	if (@$_GET["contenu"] == 'tagsADD' || @$_GET["contenu"] == 'tagsOTE') { $contenu[] = $_GET["contenu"]; $src[] = $_GET["src"]; } 
+	//if (@$_GET["contenu"] == 'contenutagsADD') { $contenu[] = $_GET["contenu"]; } 
+	$contenu = $contenu ?? $_GET["contenu"] ?? "comment";
 	$dir = $prefixe.$config['attached']['directory'];
-	$SkipUser = $SkipUser ?? false;
+	$IssueID = $IssueID ?? $_GET["IssueID"] ?? 0;
+	$ProjectID = $ProjectID ?? $_GET["ProjectID"] ?? 0;
+	$src = $src ?? $_GET["src"] ?? "tinyissue";
+	$SkipUser = $SkipUser ?? $_GET["SkipUser"] ?? false;
 	$Type = $Type ?? $_GET["Type"] ?? 'Issue';
 	$UserID = $User ?? $_GET["User"] ?? Auth::user()->id ?? 1;
 
@@ -25,29 +32,24 @@
 		$Lng['tinyissue'] = $emailLng;
 		$Lng['email'] = $emailLnE;
 	}
+
 	$optMail = $config["mail"];
-	$ProjectID = $ProjectID ?? 0;
-	$IssueID = $IssueID ?? 0;
 
 	//Titre et corps du message selon les configurations choisies par l'administrateur
 	$message = "";
 	if (is_array(@$contenu)) {
-		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.$contenu[0].'_tit'];
+		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.strtolower($contenu[0]).'_tit'];
 		foreach ($contenu as $ind => $val) {
 			if ($src[$ind] == 'value') {
 				$message .= '<i>'.$val.'</i>';
 			} else {
-				$message .= (file_exists($dir.$val.'.html')) ? file_get_contents($dir.$val.'.html') : $Lng[$src[$ind]]['following_email_'.$val];
-//				if (file_exists($dir.$val.'.html')) {
-//					$message .= file_get_contents($dir.$val.'.html');
-//				} else {
-//					$message .= $Lng[$src[$ind]]['following_email_'.$val];
-//				}
+				$message .= (file_exists($dir.$val.'.html')) ? file_get_contents($dir.$val.'.html') : $Lng[$src[$ind]]['following_email_'.strtolower($val)];
 			}
 		}
 	} else {
 		$message = @$contenu;
 	}
+	
 	$subject = $subject ?? 'BUGS';
 
 		//Select email addresses
@@ -170,6 +172,7 @@
 		}
 	}
 	
+	
 function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
 	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$link = substr($link, 0, strpos($link, "?"));
@@ -206,4 +209,5 @@ function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
 	$body = str_replace('{issues}',	$liss.$follower["title"].$lfin, $body);
 	return $body;
 }
+
 ?>
