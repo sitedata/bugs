@@ -9,6 +9,7 @@ if(isset($_POST['create_config']) && isset($_POST['database_host'])) {
 	$config_file = file_get_contents('../config.app.example.php');
 
 	/* Edit URL Information */
+	$_POST['URL'] = (substr($_POST['URL'], 1) == '/') ? $_POST['URL'] : $_POST['URL'].'/';
 	$config_file = str_replace("'url' => '',", "'url' => '".$_POST['URL']."',", $config_file);
 	
 	/* Edit Database Information */
