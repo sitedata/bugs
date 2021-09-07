@@ -103,10 +103,11 @@ class Project_Issue_Controller extends Base_Controller {
 				$resu  = \DB::table('projects')->select(array('default_assignee'))->where('id', '=', $NumNew)->get();
 				$NumResp = $resu[0]; 
 			}
+			$nomResp = \DB::table('users')->where('id', '=', $NumResp)->get();
+			$nomuser = \DB::table('users')->where('id', '=', \Auth::user()->id)->get();
 
 			$result  = __('tinyissue.edit_issue')." : ";
-			//$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => 'Ce billet a été de projet, passant de '.Input::get('projetOld').' à '.$NumNew.' ( confié à '.$NumNewResp.') par l`action de '.\Auth::user()->id.'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
-			$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => 'Ce billet a été de responsable.  Il est désormais confié à '.$NumNewResp.'.  C`est un décision de '.\Auth::user()->name.'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
+			$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => __('tinyissue.issue_chg_resp').' '.$nomRes[4].' '.$nomRes[5].'.  '.__('tinyissue.issue_chg_resp_dec').' '.$nomuser[4].' '.$nomuser[5].'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
 			$result .= ($Modif) ? "Succès" : "Échec";
 			$Modif = Project\Issue::where('project_id', '=', intval(Input::get('projetOld')))->where('id', '=', intval(Input::get('ticketNum')))->update(array('project_id' => $NumNew, 'assigned_to' => $NumNewResp, 'updated_at' => date("Y-m-d H:i:s"), 'updated_by' => \Auth::user()->id));
 			$result .= ($Modif) ? "Succès" : "Échec";
