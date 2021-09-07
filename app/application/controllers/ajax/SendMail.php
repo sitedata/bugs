@@ -16,6 +16,7 @@
 	if ($Type == 'User') {
 		$resu = Requis("SELECT * FROM users WHERE email = '".$UserID."'");
 	} else {
+		$UserID = is_array($UserID) = $UserID[0] : $UserID;
 		$resu = Requis("SELECT * FROM users WHERE id = ".$UserID);
 	}
 	$QuelUser = Fetche($resu);
