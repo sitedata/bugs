@@ -185,7 +185,7 @@ class Project_Controller extends Base_Controller {
 
 		if($update['success']) {
 			//Email to all of this project's followers
-			$this->Courriel ('Project', true, Project::current()->id, Project::current()->id, \Auth::user()->id, array('projectmod',$ancProj), array('tinyissue','value'));
+			$this->Courriel ('Project', true, Project::current()->id, Project::current()->id, Auth::user()->id, array('projectmod',$ancProj), array('tinyissue','value'));
 			return Redirect::to(Project::current()->to('edit'))
 				->with('notice', __('tinyissue.project_has_been_updated'));
 		}
@@ -195,6 +195,7 @@ class Project_Controller extends Base_Controller {
 			->with('notice-error', __('tinyissue.we_have_some_errors'));
 	}
 	public function Courriel ($Type, $SkipUser, $ProjectID, $IssueID, $User, $contenu, $src) {
+		$User = Auth::user()->id;
 		include_once "application/controllers/ajax/SendMail.php";
 	}
 }
