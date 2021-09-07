@@ -113,7 +113,7 @@
 				$body .= $passage_ligne;
 				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
 				$body .= $passage_ligne.'';
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID, $url);
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, false, $url);
 				mail($follower["email"], $subject, $body, $headers);
 			} else {
 				$mail = new PHPMailer();
@@ -157,7 +157,7 @@
 				$body .= $message;
 				$body .= '<br /><br />';
 				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID, $rl);
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, false, $rl);
 				if ($mail->ContentType == 'html') {
 					$mail->IsHTML(true);
 					$mail->WordWrap = (isset($optMail['linelenght'])) ? $optMail['linelenght'] : 80;
@@ -174,11 +174,13 @@
 	}
 	
 	
-function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false, $url = '') {
+function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false, $url) {
 	$link = ($url != '') ? $url : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
 	$lfin = $tit ? ' »' : '</a>';
-	$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID."/", $link)).'">';
-	$lpro = $tit ? ' « ' : '<a href="'.substr($link, 0, strpos($link, "issue"))."issues?tag_id=1".'">';
+	//$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID."/", $link)).'">';
+	//$lpro = $tit ? ' « ' : '<a href="'.substr($link, 0, strpos($link, "issue"))."issues?tag_id=1".'">';
+	$liss = $tit ? ' « ' : '<a href="'.$link."project/".$ProjectID."/issue/".$IssueID."/".'">';
+	$lpro = $tit ? ' « ' : '<a href="'.$link."project/".$ProjectID."/issues?tag_id=1".'">';
 	$body = str_replace('{frst}', ucwords($follower["first"]), $body);
 	$body = str_replace('{firt}', ucwords($follower["first"]), $body);
 	$body = str_replace('{firs}', ucwords($follower["first"]), $body);
