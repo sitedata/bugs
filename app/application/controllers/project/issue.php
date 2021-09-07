@@ -101,9 +101,10 @@ class Project_Issue_Controller extends Base_Controller {
 			$NumNewResp = intval(Input::get('projectNewResp'));
 			if ($NumNewResp == 0) {
 				$resu  = \DB::table('projects')->select(array('default_assignee'))->where('id', '=', $NumNew)->get();
-				$NumResp = $resu[0]; 
+				$NumResp = $resu[0];
+				$NumNewResp = $resu[0];
 			}
-			$nomResp = \DB::table('users')->where('id', '=', $NumResp)->get();
+			$nomResp = \DB::table('users')->where('id', '=', $NumNewResp)->get();
 			$nomuser = \DB::table('users')->where('id', '=', \Auth::user()->id)->get();
 
 			$result  = __('tinyissue.edit_issue')." : ";
