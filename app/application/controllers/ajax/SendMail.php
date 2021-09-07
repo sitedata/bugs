@@ -11,12 +11,12 @@
 	$src = $src ?? $_GET["src"] ?? "tinyissue";
 	$SkipUser = $SkipUser ?? $_GET["SkipUser"] ?? false;
 	$Type = $Type ?? $_GET["Type"] ?? 'Issue';
-	$UserID = $User ?? $_GET["User"] ?? Auth::user()->id ?? 1;
+	$UserID = $User ?? $_GET["User"] ?? $_GET["UserID"] ?? Auth::user()->id ?? 1;
 
 	if ($Type == 'User') {
 		$resu = Requis("SELECT * FROM users WHERE email = '".$UserID."'");
 	} else {
-		$UserID = is_array($UserID) = $UserID[0] : $UserID;
+		$UserID = is_array($User) ? $User[0] : $User;
 		$resu = Requis("SELECT * FROM users WHERE id = ".$UserID);
 	}
 	$QuelUser = Fetche($resu);
