@@ -95,6 +95,7 @@ class Project_Issue_Controller extends Base_Controller {
 	public function get_edit() {
 		if (@$_GET["ticketAct"] == 'changeProject') {
 			//Change the asssociation between this issue and its related project
+			$ancProj = Project::current()->name;
 			$msg = 0;
 			$NumNew = intval(Input::get('projectNew'));
 			$NumNewResp = intval(Input::get('projectNewResp'));
@@ -112,7 +113,7 @@ class Project_Issue_Controller extends Base_Controller {
 			if (\User\Activity::add(8, intval(Input::get('projetOld')), Input::get('ticketNum'), $NumNew, "From ".Input::get('projetOld')." to ".$NumNew )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
 
 			//Email to followers
-			$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issueproject'), array('tinyissue'));
+			$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issueproject', $ancProj), array('tinyissue', 'value'));
 
 			return Redirect::to("project/".$NumNew."/issues?tag_id=1");
 
@@ -449,10 +450,7 @@ class Project_Issue_Controller extends Base_Controller {
 			if (\User\Activity::add(7, $Project, $Issue, $Quel[0]->id, $fileName )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
 		}
 
-		//Fifth step: Notice the followers
-		$this->Courriel ('Issue', true, Project::current()->id, $Issue, Auth::user()->id, array('attached'), array('tinyissue'));
-
-		//Sixth step: Show on user's desk
+		//Fifth step: Show on user's desk
 		if (is_numeric($msg)) {
 			$rep = (substr($rep, 0, 3) == '../') ? substr($rep, 3) : $rep;
 			$msg .= ';';
@@ -464,6 +462,10 @@ class Project_Issue_Controller extends Base_Controller {
 			$msg .= '<a href="'.$url.$rep.$fileName.'?'.$now.'" target="_blank" />';
 			$msg .= '<b>'.$fileName.'</b>';
 			$msg .= '</div></div></div>';
+
+			//Sixth step: Notice the followers
+			$this->Courriel ('Issue', true, Project::current()->id, $Issue, Auth::user()->id, array('attached'), array('tinyissue'));
+
 		}
 		return $msg;
 	}
