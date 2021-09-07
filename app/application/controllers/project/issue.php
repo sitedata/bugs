@@ -108,7 +108,7 @@ class Project_Issue_Controller extends Base_Controller {
 			$nomuser = \DB::table('users')->where('id', '=', \Auth::user()->id)->get();
 
 			$result  = __('tinyissue.edit_issue')." : ";
-			$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => __('tinyissue.issue_chg_resp').' '.$nomRes[4].' '.$nomRes[5].'.  '.__('tinyissue.issue_chg_resp_dec').' '.$nomuser[4].' '.$nomuser[5].'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
+			$Modif = \DB::table('projects_issues_comments')->where('project_id', '=', intval(Input::get('projetOld')))->where('issue_id', '=', intval(Input::get('ticketNum')), 'AND')->update(array('project_id' => $NumNew, 'comment' => __('tinyissue.issue_chg_resp').' '.$nomResp[4].' '.$nomResp[5].'.  '.__('tinyissue.issue_chg_resp_dec').' '.$nomuser[4].' '.$nomuser[5].'.','created_at' => date("Y-m-d H:i:s"),'updated_at' => date("Y-m-d H:i:s")));
 			$result .= ($Modif) ? "Succès" : "Échec";
 			$Modif = Project\Issue::where('project_id', '=', intval(Input::get('projetOld')))->where('id', '=', intval(Input::get('ticketNum')))->update(array('project_id' => $NumNew, 'assigned_to' => $NumNewResp, 'updated_at' => date("Y-m-d H:i:s"), 'updated_by' => \Auth::user()->id));
 			$result .= ($Modif) ? "Succès" : "Échec";
