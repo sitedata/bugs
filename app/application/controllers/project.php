@@ -172,7 +172,7 @@ class Project_Controller extends Base_Controller {
 		if(Input::get('delete')) {
 			//Email to all of this project's followers
 			$followers =\DB::query("SELECT USR.email, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, PRO.name FROM following AS FAL LEFT JOIN users AS USR ON USR.id = FAL.user_id LEFT JOIN projects AS PRO ON PRO.id = FAL.project_id WHERE FAL.project_id = ".Project::current()->id." AND FAL.project = 1 ".((isset($thisIssue[0])) ? " AND FAL.user_id NOT IN (".$thisIssue[0]->attributes["assigned_to"].",".\Auth::user()->id.")" : ""). "");
-			Courriel ('Project', true, Project::current()->id, 0, $followers, array('projectdel'), array('tinyissue');
+			Courriel ('Project', true, Project::current()->id, 0, $followers, array('projectdel'), array('tinyissue'));
 //			foreach ($followers as $ind => $follower) { 
 //				\Mail::send_email(__('tinyissue.following_email_projectmod')." « ".$follower->title." ».", $follower->email, __('tinyissue.following_email_projectmod_tit'));
 //			} 

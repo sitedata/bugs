@@ -34,6 +34,7 @@
 	}
 
 	$optMail = $config["mail"];
+	$url = trim($config["url"]);
 
 	//Titre et corps du message selon les configurations choisies par l'administrateur
 	$message = "";
@@ -86,7 +87,7 @@
 
 	if (Nombre($followers) > 0) {
 		while ($follower = Fetche($followers)) {
-			$subject = wildcards($subject, $follower,$ProjectID, $IssueID, true);
+			$subject = wildcards($subject, $follower,$ProjectID, $IssueID, true, $url);
 			$passage_ligne = (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $follower["email"])) ? "\r\n" : "\n";
 			$message = str_replace('"', "``", $message);
 			$message = stripslashes($message);
@@ -112,7 +113,7 @@
 				$body .= $passage_ligne;
 				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
 				$body .= $passage_ligne.'';
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, $url);
 				mail($follower["email"], $subject, $body, $headers);
 			} else {
 				$mail = new PHPMailer();
@@ -156,7 +157,7 @@
 				$body .= $message;
 				$body .= '<br /><br />';
 				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, $rl);
 				if ($mail->ContentType == 'html') {
 					$mail->IsHTML(true);
 					$mail->WordWrap = (isset($optMail['linelenght'])) ? $optMail['linelenght'] : 80;
@@ -173,8 +174,8 @@
 	}
 	
 	
-function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false) {
-	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false, $url = '') {
+	$link = ($url != '') ? $url : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
 	$lfin = $tit ? ' »' : '</a>';
 	$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID."/", $link)).'">';
 	$lpro = $tit ? ' « ' : '<a href="'.substr($link, 0, strpos($link, "issue"))."issues?tag_id=1".'">';
