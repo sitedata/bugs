@@ -185,7 +185,7 @@ class Project_Controller extends Base_Controller {
 
 		if($update['success']) {
 			//Email to all of this project's followers
-			$this->Courriel ('Project', true, Project::current()->id, 0, \Auth::user()->id, array('projectmod',$ancProj), array('tinyissue','value'));
+			$this->Courriel ('Project', true, Project::current()->id, Project::current()->id, \Auth::user()->id, array('projectmod',$ancProj), array('tinyissue','value'));
 			return Redirect::to(Project::current()->to('edit'))
 				->with('notice', __('tinyissue.project_has_been_updated'));
 		}
