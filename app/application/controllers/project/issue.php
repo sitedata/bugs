@@ -115,7 +115,8 @@ class Project_Issue_Controller extends Base_Controller {
 			if (\User\Activity::add(8, intval(Input::get('projetOld')), Input::get('ticketNum'), $NumNew, "From ".Input::get('projetOld')." to ".$NumNew )) { $msg = $msg + 1; } else { $msg = $TheFile["error"]; }
 
 			//Email to followers
-			$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issueproject', $ancProj), array('tinyissue', 'value'));
+			//$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('issueproject', $ancProj), array('tinyissue', 'value'));
+			$this->Courriel ('Issue', true, $NumNew, Project\Issue::current()->id, Auth::user()->id, array('issueproject', $ancProj), array('tinyissue', 'value'));
 
 			return Redirect::to("project/".$NumNew."/issues?tag_id=1");
 
