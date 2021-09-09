@@ -1,5 +1,10 @@
 <?php
 session_start();
+foreach (@$_GET as $ind => $val) {
+	if (strstr($val, "<") != '' || strstr(htmlspecialchars_decode($val), "<") != '' || str_contains($val, "script") != '') {
+		unset($_GET[$ind]); 
+	}
+}
 include_once "../app/application/language/all.php";
 $EnLng = require_once("../app/application/language/en/install.php");
 if (!isset($_GET["Lng"]) || !file_exists("../app/application/language/".@$_GET["Lng"]."/install.php")) { $_GET["Lng"] = 'en'; }

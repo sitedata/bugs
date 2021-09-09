@@ -4,6 +4,16 @@ function ChgLng(Lng = 'en') { document.location.href = 'index.php?Lng=' + Lng; }
 </script>
 
 <?php
+foreach (@$_GET as $ind => $val) {
+	if (strstr($val, "<") != '' || strstr(htmlspecialchars_decode($val), "<") != '' || str_contains($val, "script") != '') {
+		unset($_GET[$ind]); 
+	}
+}
+foreach (@$_POST as $ind => $val) {
+	if (strstr($ind, "password") == '' && (strstr($val, "<") != '' || strstr(htmlspecialchars_decode($val), "<") != '' || str_contains($val, "script") != '')) {
+		unset($_POST[$ind]); 
+	}
+}
 if(isset($_POST['create_config']) && isset($_POST['database_host'])) {
 	if(!file_exists('../config.app.example.php')) { die($NoConfigApp); }
 	$config_file = file_get_contents('../config.app.example.php');
