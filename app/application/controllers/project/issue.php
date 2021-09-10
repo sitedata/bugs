@@ -314,15 +314,15 @@ class Project_Issue_Controller extends Base_Controller {
 			$Modif = (Input::get('Modif') !== NULL) ? Input::get('Modif') :  false;
 			$Quel = (Input::get('Quel')  !== NULL ) ? Input::get('Quel') : "xyzxyz";
 			$TagNum = Tag::where('tag', '=', $Quel )->first(array('id','tag','ftcolor','bgcolor'));
-			if (!isset($TagNum) || @$TagNum == '' ) { $Modif = false; $Quel = "xyzxyz"; }
+			if (!isset($TagNum) || @$TagNum == '' ) { 
+				$Modif = false; $Quel = "xyzxyz"; 
+			} else {
+				//Get tag infos
+				$IssueTagNum = \DB::table('projects_issues_tags')->where('issue_id', '=', $Issue)->where('tag_id', '=', $TagNum->attributes['id'], 'AND' )->first(array('id','tag','ftcolor','bgcolor'));
+			}
 
-
-			/**
-			 * Edit an issue
-			 * Adding a tag
-			 */
+			//Adding a tag
 			if ($Modif == 'AddOneTag' ) {
-				$IssueTagNum = \DB::table('projects_issues_tags')->where('issue_id', '=', $Issue)->where('tag_id', '=', $TagNum->attributes['id'], 'AND' )->first(array('id'));
 				$now = date("Y-m-d H:i:s");
 				if ($IssueTagNum == NULL) {
 					\DB::table('projects_issues_tags')->insert(array('id'=>NULL,'issue_id'=>$Issue,'tag_id'=>$TagNum->attributes['id'],'created_at'=>$now,'updated_at'=>$now) );
@@ -334,31 +334,20 @@ class Project_Issue_Controller extends Base_Controller {
 				$Show = true;
 			}
 
-			/**
-			 * Edit an issue
-			 * Taking a tag off
-			 */
+			//Taking a tag off
 			if ($Modif == 'eraseTag') {
-				$IssueTagNum =\DB::table('projects_issues_tags')->where('issue_id','=',$Issue)->where('tag_id','=',$TagNum->id,'AND')->first('id');
 				\DB::table('projects_issues_tags')->delete($IssueTagNum->id);
 				$Action = $Issue;
 				$Modif = true;
 				$Msg = '<span style="color:#F00;">'.__('tinyissue.tag_removed').'</span>';
 				$Show = true;
-				//2 sept 2021 : désactivé en vue de trouver une solution
-				//$this->Courriel ('Issue', true, Project::current()->id, Project\Issue::current()->id, Auth::user()->id, array('tagsOTE'), array('tinyissue'));
 			}
 
-
-			/**
-			 * Update database
-			 */
-			if ($Show) { \User\Activity::add(6, $Action, $Issue, $TagNum->attributes['id'] ); }
-
-			/**
-			 * Show on screen what just happened
-			 */
+			//* Store and show what just happened  ( or adding or removing )
 			if (isset($TagNum) && $Quel != "xyzxyz") {
+			 	// Update database
+				if ($Show) { \User\Activity::add(6, 5, $Issue, NULL, '{'.$added_tags.$removed_tags.'"tag_data":{"'.$TagNum->attributes['id'].'":{"id":'.$TagNum->attributes['id'].',"tag":"'.$TagNum->attributes['tag'].'","bgcolor":"'.$TagNum->attributes['bgcolor'].'","ftcolor":"'.$TagNum->attributes['ftcolor'].'"}},"tags_test":"Baboom en poudre"}' ); }
+				//Prepare data to be shown
 				$content .= '<div class="insides"><div class="topbar"><div class="data">';
 				$content .= '<label style="color: '.$TagNum->attributes['ftcolor'].'; background-color: '.$TagNum->attributes['bgcolor'].'; padding: 5px 10px; border-radius: 8px;">';
 				$content .= $TagNum->attributes['tag'].'</label>';
