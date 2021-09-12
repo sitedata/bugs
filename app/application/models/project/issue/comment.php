@@ -8,14 +8,12 @@ class Comment extends  \Eloquent {
 	/**
 	 * @return \User
 	 */
-	public function user()
-	{
+	public function user() {
 		return $this->belongs_to('\User', 'created_by');
 	}
 
 
-	public function attachments()
-	{
+	public function attachments() {
 		return $this->has_many('Project\Issue\Attachment', 'comment_id');
 	}
 
@@ -28,8 +26,7 @@ class Comment extends  \Eloquent {
 	 * @param  \Project\Issue  $issue
 	 * @return Comment
 	 */
-	public static function create_comment($input, $project, $issue)
-	{
+	public static function create_comment($input, $project, $issue) {
 		if (trim($input['comment']) == '') { return true; }
 		$config_app = require path('public') . 'config.app.php';
 		if (!isset($config_app['Percent'])) { $config_app['Percent'] = array (100,0,10,80,100); }
@@ -181,8 +178,7 @@ class Comment extends  \Eloquent {
 	 * @param  string  $body
 	 * @return string
 	 */
-	public static function format($body)
-	{
+	public static function format($body) {
 		$body = \Sparkdown\Markdown($body);
 		// convert issue numbers into issue url
 		return preg_replace('/((?:' . __('tinyissue.issue') . ')?)(\s*)#(\d+)/i', '<a href="' . \URL::to('/project/0/issue/$3') . '" title="$1 #$3" class="issue-link">$1 #$3</a>', $body);
