@@ -14,9 +14,9 @@
 					echo ' '; 
 					echo __('tinyissue.in'); 
 					echo ' '; 
-					echo '<a href="'.$issue->to().'">'.$issue->title.'</a>';
+					echo '<a href="'.$issue->to().'">'.$issue->title.'</a>&nbsp;';
 					echo __('tinyissue.by'); 
-					echo '<strong>'.$user->firstname . ' ' . $user->lastname.'</strong>';
+					echo '&nbsp;<strong>'.$user->firstname . ' ' . $user->lastname.'</strong>&nbsp;';
 				} 
 			
 			if($tag_counts['added'] > 0 && $tag_counts['removed'] > 0) { echo '<div class="tag-activity-spacer"></div>'; } 
