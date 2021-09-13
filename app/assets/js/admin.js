@@ -130,7 +130,7 @@
 				if (xhttp.responseText != '' ) {
 					Affiche = Quel;
 					if (Question == 'OUI') { 
-						document.getElementById('global-notice').innerHTML = xhttp.responseText;
+						document.getElementById('global-notice').innerHTML = 'Modification apportée avec succès.  /  Successfully updated.';
 						document.getElementById('global-notice').style.display = 'block';   
 						setTimeout(function(){
 							document.getElementById('global-notice').style.display = 'none';   
@@ -149,15 +149,15 @@
 	}
 	
 	function Verdissons(champs,msg) {
-		document.getElementById('global-notice').innerHTML = xhttp.responseText;
+		document.getElementById('global-notice').innerHTML = msg;
 		document.getElementById('global-notice').style.display = 'block';   
 		setTimeout(function(){
 			document.getElementById('global-notice').style.display = 'none';   
 		}, 7500);
-//		for (x=0; x<champs.length; x++) {
-//			document.getElementById(champs[x]).style.backgroundColor = 'green';
-//		}
-//		var blanc = setTimeout(function() { for (x=0; x<champs.length; x++) { document.getElementById(champs[x]).style.backgroundColor = 'white'; } }, 5000);
+		for (x=0; x<champs.length; x++) {
+			document.getElementById(champs[x]).style.backgroundColor = 'green';
+		}
+		var blanc = setTimeout(function() { for (x=0; x<champs.length; x++) { document.getElementById(champs[x]).style.backgroundColor = 'white'; } }, 5000);
 	}
 
 	function VerifChamps(champs) {

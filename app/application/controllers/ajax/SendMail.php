@@ -49,7 +49,7 @@
 			}
 		}
 	} else {
-		$message = @$contenu;
+		$message = (@$contenu != 'comment') ? @$contenu : "";
 	}
 	
 	$subject = $subject ?? 'BUGS';
