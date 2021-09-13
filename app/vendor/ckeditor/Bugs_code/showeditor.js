@@ -45,13 +45,11 @@ function ChangeonsEditor(id, contenu) {
 }
 
 function ConservEditor(id) {
-	alert("Nous voici en ligne 45");
 	var SSdiv = 'textarea_' + id + '_SSdiv';
 	AllEditors[SSdiv] = CKEDITOR.instances['textarea_' + id + '_SSdiv'].getData();
 	var contenu = AllEditors[id].getData();
-	//var contenu = document.getElementById(SSdiv).innerHTML;
-	//var posi = contenu.indexOf("Telephone");
-	alert("Voici le contenu lu : \ln" + contenu);
+	alert("Nous sommes en chantier ici, veuillez patienter");
+	//alert("Voici le contenu lu : \ln" + contenu);
 }
 
 function SupprimonsEditor(id) {
