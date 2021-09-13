@@ -32,6 +32,8 @@ return array(
 	'closed_by' => 'Fermé par',
 	'closed_issue' => 'Billet fermé',
 	'closed_issues' => 'Billets fermés',
+	'comment_edited' => 'Commentaire modifié',
+	'comment_editinng_hist' => 'Historique des modifications',
 	'comment_deleted' => 'Commentaire supprimé',
 	'comment_on_this_issue' => 'Commenter ce billet :',
 	'comment' => 'Commenter',

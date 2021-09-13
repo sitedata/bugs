@@ -293,7 +293,9 @@ VALUES
 	(7,'Attached a file to issue','attached-file'),
 	(8,'Move an issue from project A to project B',	'ChangeIssue-project'),
 	(9,'User starts or stop following issue or project', 'Follow'),
-	(10, 'Updated an issue', 'IssueEdit');
+	(10,'Updated an issue', 'IssueEdit'),
+	(11,'Deleted a comment', 'delete_comment'),
+	(12,'Edited a comment','edit_comment' );
 #--
 
 #--#Create default tags : id 10

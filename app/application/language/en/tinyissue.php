@@ -32,6 +32,8 @@ return array(
 	'closed_by' => 'Closed By',
 	'closed_issue' => 'Closed Issue',
 	'closed_issues' => 'Closed Issues',
+	'comment_edited' => 'Edited commentaire',
+	'comment_editinng_hist' => 'History of editions ',
 	'comment_deleted' => 'Comment Deleted',
 	'comment_on_this_issue' => 'Comment on this issue:',
 	'comment' => 'Comment',

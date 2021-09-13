@@ -332,6 +332,11 @@ function AddTag (Quel,d) {
 
 }
 
+function ConservEditor(id) {
+	alert("Nous passons ici en ConservEditor qui ne fait rien.  \n\nVeuillez signaler application/views/project/issue/index.php");
+}
+
+
 function Following(Quoi, etat) {
 	if (Quoi == 'comments' ) {
 		document.getElementById('input_following_attached').checked = etat; 
@@ -499,6 +504,7 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 	xhttpMAIL.send(); 
 }
 <?php
+	$rendu = 0;
 	$wysiwyg = Config::get('application.editor');
 	if (trim(@$wysiwyg['directory']) != '') {
 		if (file_exists($wysiwyg['directory']."/Bugs_code/showeditor.js")) {
@@ -506,11 +512,12 @@ function Reassignment (Project, Prev, Suiv, Issue) {
 			if ($wysiwyg['name'] == 'ckeditor') {
 				echo "
 				setTimeout(function() {
-					showckeditor ('comment');
+					showckeditor ('comment', ".$rendu++.");
 				} , 567);
 				";
 			}
 		} 
 	} 
 ?>
+
 </script>

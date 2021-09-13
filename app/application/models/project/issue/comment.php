@@ -140,10 +140,23 @@ class Comment extends  \Eloquent {
 	 * @param int    $content
 	 * @return bool
 	 */
-	public static function edit_comment($idComment, $content) {
-		\DB::table('projects_issues_comments')->where('id', '=', $idComment)->update(array('comment' => $content, 'updated_at' => date("Y-m-d H:i:s")));
-		$idComment = static::find($idComment);
+	public static function edit_comment($id, $project, $content) {
+		$idComment = static::find($id);
 		if(!$idComment) { return false; }
+		$Avant = \DB::table('projects_issues_comments')->where('id', '=', $id)->first(array('id', 'project_id', 'issue_id', 'comment', 'created_at'));
+		$edited_id = \DB::table('users_activity')->insert_get_id(array(
+						'id'=>NULL,
+						'user_id'=>\Auth::user()->id,
+						'parent_id'=>$Avant->project_id,
+						'item_id'=>$Avant->issue_id,
+						'action_id'=>$id,
+						'type_id'=>12,
+						'data'=>$Avant->comment,
+						'created_at'=>$Avant->created_at,
+						'updated_at'=>date("Y-m-d H:i:s")
+					));
+
+		\DB::table('projects_issues_comments')->where('id', '=', $id)->update(array('comment' => $content, 'updated_at' => date("Y-m-d H:i:s")));
 		return true;
 	}
 
@@ -154,15 +167,26 @@ class Comment extends  \Eloquent {
 	 * @return bool
 	 */
 	public static function delete_comment($comment) {
-		\User\Activity::where('action_id', '=', $comment)->delete();
-
 		$comment = static::find($comment);
+		$issue = \Project\Issue::find($comment->issue_id);
+		$deleted_id = \DB::table('users_activity')->insert_get_id(array(
+						'id'=>NULL,
+						'user_id'=>\Auth::user()->id,
+						'parent_id'=>$issue->project_id,
+						'item_id'=>$comment->issue_id,
+						'action_id'=>NULL,
+						'type_id'=>11,
+						'data'=>$comment->comment,
+						'created_at'=>date("Y-m-d H:i:s"),
+						'updated_at'=>date("Y-m-d H:i:s")
+					));
+//		\User\Activity::where('action_id', '=', $comment)->delete();
+
 		if(!$comment) { return false; }
 
-		$issue = \Project\Issue::find($comment->issue_id);
 
 		/* Delete attachments and files */
-		$path = \Config::get('application.upload_path') . $issue->project_id;
+		$path = \Config::get('application.upload_path').$issue->project_id;
 		foreach($comment->attachments()->get() as $row) {
 			Attachment::delete_file($path . '/' . $row->upload_token, $row->filename);
 			$row->delete();
