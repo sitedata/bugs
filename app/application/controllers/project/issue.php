@@ -167,12 +167,21 @@ class Project_Issue_Controller extends Base_Controller {
 	 * @request ajax
 	 * @return string
 	 */
-	public function post_edit_comment() {
-		if(Input::get('body')) {
-			$comment = \Project\Issue\Comment::edit_comment(str_replace('comment', '', Input::get('id')), str_replace("'", "`", Input::get('body')));
-			return true;
-		}
+//	public function post_edit_comment() {
+//		//Project\Issue\Comment::edit_comment(Input::get('comment'));
+//
+//		return Redirect::to(Project\Issue::current()->to())
+//			->with('notice', __('tinyissue.comment_edited'));
+//	}
+
+	public function get_edit_comment($id, $contenu) {
+		//Project\Issue\Comment::edit_comment(Project\Issue::current()->id,Input::get('id'));
+		Project\Issue\Comment::edit_comment(Input::get('id'), Project\Issue::current()->id,Input::get('content'));
+
+		return Redirect::to(Project\Issue::current()->to())
+			->with('notice', __('tinyissue.comment_edited'));
 	}
+
 
 	/**
 	 * Delete a comment

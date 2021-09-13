@@ -34,22 +34,17 @@ function CachonsEditor(id) {
 	if (document.getElementById('div_comment_' + id + '_Sdiv')) { 
 		document.getElementById('div_comment_' + id + '_Sdiv').style.display = "none"; 
 		AllEditors[id].setData(document.getElementById('div_comment_' + id + '_issue').innerHTML);
-		return AllEditors['textarea_' + id + '_SSdiv'].getData();
-	} else {
-		return AllEditors[id].getData();
+		id = 'textarea_' + id + '_SSdiv';
 	}
+	return AllEditors[id].getData();
 }
 
 function ChangeonsEditor(id, contenu) {
 	return AllEditors[id].setData(contenu);
 }
 
-function ConservEditor(id) {
-	var SSdiv = 'textarea_' + id + '_SSdiv';
-	AllEditors[SSdiv] = CKEDITOR.instances['textarea_' + id + '_SSdiv'].getData();
-	var contenu = AllEditors[id].getData();
-	alert("Nous sommes en chantier ici, veuillez patienter");
-	//alert("Voici le contenu lu : \ln" + contenu);
+function EditonsTexte(url,id) {
+	document.location.href = url + "&content=" + AllEditors[id].getData();
 }
 
 function SupprimonsEditor(id) {
