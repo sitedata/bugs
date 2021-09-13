@@ -32,7 +32,8 @@
 		}
 		if (strpos($MesLignes[$rendu], "'PriorityColors'") !== false && strpos($MesLignes[$rendu], "****") === false && !isset($NumLigne['PriorityColors']))  { 
 			$NumLigne['PriorityColors'] = $rendu; 
-			$MesLignes[$rendu] = substr($MesLignes[$rendu], 0, strpos($MesLignes[$rendu], '=>')+2)." array ('".$_POST["coulo"]."', '".$_POST["coula"]."','".$_POST["coulb"]."','".$_POST["coulb"]."','".$_POST["coulc"]."','".$_POST["could"]."','".$_POST["coule"]."'),
+//			$MesLignes[$rendu] = substr($MesLignes[$rendu], 0, strpos($MesLignes[$rendu], '=>')+2)." array ('".$_POST["coulo"]."', '".$_POST["coula"]."','".$_POST["coulb"]."','".$_POST["coulb"]."','".$_POST["coulc"]."','".$_POST["could"]."','".$_POST["coule"]."'),
+			$MesLignes[$rendu] = "	'PriorityColors' => array ('".$_POST["coulo"]."', '".$_POST["coula"]."','".$_POST["coulb"]."','".$_POST["coulc"]."','".$_POST["could"]."','".$_POST["coule"]."'), 
 ";
 		}
 		++$rendu;
