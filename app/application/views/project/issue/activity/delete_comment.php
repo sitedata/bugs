@@ -12,7 +12,7 @@
 					} else {
 					 	echo '<ul>';
 					 	echo '<li class="deleted-comment">';
-					 	echo '<a href="javascript: alert(\''.$activity->data.'\');">Infos</a>';
+					 	echo '<a href="javascript: AffichonsVieux(\''.$issue->to('').'\','.$activity->id.');">Infos</a>';
 					 	echo '</li>';
 					 	echo '</ul>';
 					 	echo '<label class="label notice">'.__('tinyissue.comment_deleted').'</label><b>';
