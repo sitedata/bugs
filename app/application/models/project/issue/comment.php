@@ -180,17 +180,17 @@ class Comment extends  \Eloquent {
 						'created_at'=>date("Y-m-d H:i:s"),
 						'updated_at'=>date("Y-m-d H:i:s")
 					));
-//		\User\Activity::where('action_id', '=', $comment)->delete();
+		\DB::table('projects_issues_comments')->where('id', '=', $comment->id)->delete();
 
 		if(!$comment) { return false; }
 
 
-		/* Delete attachments and files */
-		$path = \Config::get('application.upload_path').$issue->project_id;
-		foreach($comment->attachments()->get() as $row) {
-			Attachment::delete_file($path . '/' . $row->upload_token, $row->filename);
-			$row->delete();
-		}
+//		/* Delete attachments and files */
+//		$path = \Config::get('application.upload_path').$issue->project_id;
+//		foreach($comment->attachments()->get() as $row) {
+//			Attachment::delete_file($path . '/' . $row->upload_token, $row->filename);
+//			$row->delete();
+//		}
 
 		return true;
 	}
