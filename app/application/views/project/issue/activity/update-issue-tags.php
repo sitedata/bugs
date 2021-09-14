@@ -3,6 +3,7 @@
 		echo '<script>document.location.href="'.URL::to().'";</script>';
 	}
 ?>
+<?php if ($activity) { ?>
 <li id="comment<?php echo $activity->id; ?>" class="comment">
 	<div class="insides">
 		<div class="topbar">
@@ -39,3 +40,4 @@
 	</div>
 	<div class="clr"></div>
 </li>
+<?php } ?>
