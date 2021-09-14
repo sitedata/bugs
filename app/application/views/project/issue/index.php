@@ -332,11 +332,6 @@ function AddTag (Quel,d) {
 
 }
 
-function ConservEditor(id) {
-	alert("Nous passons ici en ConservEditor qui ne fait rien.  \n\nVeuillez signaler application/views/project/issue/index.php");
-}
-
-
 function Following(Quoi, etat) {
 	if (Quoi == 'comments' ) {
 		document.getElementById('input_following_attached').checked = etat; 

@@ -167,12 +167,29 @@ class Project_Issue_Controller extends Base_Controller {
 	 * @request ajax
 	 * @return string
 	 */
-//	public function post_edit_comment() {
-//		//Project\Issue\Comment::edit_comment(Input::get('comment'));
-//
-//		return Redirect::to(Project\Issue::current()->to())
-//			->with('notice', __('tinyissue.comment_edited'));
-//	}
+	public function post_edit_comment() {
+//		Project\Issue\Comment::edit_comment(Input::get('id'), Project\Issue::current()->id,Input::get('content'));
+
+		$idComment = static::find(Input::get('id'));
+		if(!$idComment) { return false; }
+		$Avant = \DB::table('projects_issues_comments')->where('id', '=', Input::get('id'))->first(array('id', 'project_id', 'issue_id', 'comment', 'created_at'));
+		$edited_id = \DB::table('users_activity')->insert_get_id(array(
+						'id'=>NULL,
+						'user_id'=>\Auth::user()->id,
+						'parent_id'=>$Avant->project_id,
+						'item_id'=>$Avant->issue_id,
+						'action_id'=>Input::get('id'),
+						'type_id'=>12,
+						'data'=>$Avant->comment,
+						'created_at'=>$Avant->created_at,
+						'updated_at'=>date("Y-m-d H:i:s")
+					));
+
+		\DB::table('projects_issues_comments')->where('id', '=', Input::get('id'))->update(array('comment' => Input::get('body'), 'updated_at' => date("Y-m-d H:i:s")));
+
+		return Redirect::to(Project\Issue::current()->to())
+			->with('notice', __('tinyissue.comment_edited'));
+	}
 
 	public function get_edit_comment($id, $contenu) {
 		//Project\Issue\Comment::edit_comment(Project\Issue::current()->id,Input::get('id'));
