@@ -1,7 +1,7 @@
 <?php
 session_start();
 foreach (@$_GET as $ind => $val) {
-	if (strstr($val, "<") != '' || strstr(htmlspecialchars_decode($val), "<") != '' || str_contains($val, "script") != '') {
+	if (strstr($val, "<") != '' || strstr(htmlspecialchars_decode($val), "<") != '' || strpos($val, "script")  !== false) {
 		unset($_GET[$ind]); 
 	}
 }
