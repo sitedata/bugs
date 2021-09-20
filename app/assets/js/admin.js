@@ -28,7 +28,7 @@
 					//alert(xhttp.responseText);
 					IntroInital = intro; 
 					TxByeInital = bye;
-					Verdissons(champs);
+					Verdissons(champs,xhttp.responseText);
 				}
 			}
 		};
@@ -50,7 +50,7 @@
 			if (this.readyState == 4 && this.status == 200) {
 				if (xhttp.responseText != '' ) {
 					//alert(xhttp.responseText);
-					Verdissons(champs);
+					Verdissons(champs,xhttp.responseText);
 				}
 			}
 		};
@@ -59,7 +59,7 @@
 	}
 	
 	function AppliquerServeur() {
-		champs = new Array('input_email_encoding','input_email_linelenght','input_email_server','input_email_port','input_email_encryption','input_email_username','input_email_password','select_Email_transport','select_Email_plainHTML');
+		champs = new Array('input_email_encoding','input_email_linelenght','input_email_server','input_email_port','input_email_encryption','input_email_username','input_email_password','select_Email_transport','select_Email_plainHTML','input_email_mailerrormsg');
 		if (!VerifChamps(champs)) { return false; }
 		var xhttp = new XMLHttpRequest();
 		var formdata = new FormData();
@@ -72,12 +72,13 @@
 		formdata.append("encryption", document.getElementById('input_email_encryption').value);
 		formdata.append("username", document.getElementById('input_email_username').value);
 		formdata.append("password", document.getElementById('input_email_password').value);
+		formdata.append("mailerrormsg", document.getElementById('input_email_mailerrormsg').value);
 		var NextPage = 'app/application/controllers/ajax/ChgConfEmail_Server.php';
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (xhttp.responseText != '' ) {
 					//alert(xhttp.responseText);
-					Verdissons(champs);
+					Verdissons(champs,xhttp.responseText);
 				}
 			}
 		};
@@ -99,7 +100,11 @@
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (xhttp.responseText != '' ) {
-					alert(xhttp.responseText);
+					document.getElementById('global-notice').innerHTML = xhttp.responseText;
+					document.getElementById('global-notice').style.display = 'block';   
+					setTimeout(function(){
+						document.getElementById('global-notice').style.display = 'none';   
+					}, 7500);
 				}
 			}
 		};
@@ -124,7 +129,13 @@
 			if (this.readyState == 4 && this.status == 200) {
 				if (xhttp.responseText != '' ) {
 					Affiche = Quel;
-					if (Question == 'OUI') { alert("Mise à jour complétée"); }
+					if (Question == 'OUI') { 
+						document.getElementById('global-notice').innerHTML = 'Modification apportée avec succès.  /  Successfully updated.';
+						document.getElementById('global-notice').style.display = 'block';   
+						setTimeout(function(){
+							document.getElementById('global-notice').style.display = 'none';   
+						}, 7500); 
+					}
 					var r = xhttp.responseText;
 					var recu = r.split('||');
 					TexteInital = recu[0];
@@ -137,7 +148,12 @@
 		xhttp.send(formdata); 
 	}
 	
-	function Verdissons(champs) {
+	function Verdissons(champs,msg) {
+		document.getElementById('global-notice').innerHTML = msg;
+		document.getElementById('global-notice').style.display = 'block';   
+		setTimeout(function(){
+			document.getElementById('global-notice').style.display = 'none';   
+		}, 7500);
 		for (x=0; x<champs.length; x++) {
 			document.getElementById(champs[x]).style.backgroundColor = 'green';
 		}

@@ -21,13 +21,16 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 				<li>
 					<a href="<?php echo $row->to(); ?>" class="comments"><?php echo $row->comment_count(); ?></a>
 					
-					<?php if(!empty($row->tags)): ?>
-					<div class="tags">
-						<?php foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag): ?>
-						<?php echo '<label class="label"' . ($tag->bgcolor ? ' style="background: ' . $tag->bgcolor . '"' : '') . '>' . $tag->tag . '</label>'; ?>
-						<?php endforeach; ?>
-					</div>
-					<?php endif; ?>
+					<?php 
+					if(!empty($row->tags)) {
+						echo '<div class="tags">';
+						foreach($row->tags()->order_by('tag', 'ASC')->get() as $tag) { 
+							//2 sept 2021 recherche d'un bogue lié à ftcolor
+							echo '<label class="label" style="'.($tag->ftcolor ? 'color: '.$tag->ftcolor . ';' : '').($tag->bgcolor ? 'background-color: '.$tag->bgcolor . ';' : '').'">' . $tag->tag . '</label>';
+						}
+						echo '</div>';
+					} 
+					?>
 
 					<a href="<?php echo $row->to(); ?>" class="id">#<?php echo $row->id; ?><br /><span style="color: <?php echo $config_app['PriorityColors'][$row->status]; ?>; font-size: 200%;">&#9899;</span></span></a>
 					<div class="data">
@@ -38,7 +41,7 @@ if(!isset($config_app['PriorityColors'])) { $config_app['PriorityColors'] = arra
 							<?php echo Time::age(strtotime($row->created_at)); ?>
 
 							<?php if(!is_null($row->updated_by)): ?>
-							- <?php echo __('tinyissue.updated_by'); ?> <strong><?php echo $row->updated->firstname . ' ' . $row->updated->lastname; ?></strong>
+							- <?php echo __('tinyissue.updated_by'); ?>&nbsp;&nbsp;<strong><?php echo $row->updated->firstname . ' ' . $row->updated->lastname; ?></strong>
 							<?php echo Time::age(strtotime($row->updated_at)); ?>
 							<?php endif; ?>
 						</div>

@@ -1,14 +1,22 @@
 <?php
 	include_once "db.php";
+
 	//Préférences de l'usager
+	if (@$_GET["contenu"] == 'tagsADD' || @$_GET["contenu"] == 'tagsOTE' || @$_GET["contenu"] == 'assigned') { $contenu[] = $_GET["contenu"]; $src[] = $_GET["src"]; } 
+	//if (@$_GET["contenu"] == 'contenutagsADD') { $contenu[] = $_GET["contenu"]; } 
+	$contenu = $contenu ?? $_GET["contenu"] ?? "comment";
 	$dir = $prefixe.$config['attached']['directory'];
-	$SkipUser = $SkipUser ?? false;
+	$IssueID = $IssueID ?? $_GET["IssueID"] ?? 0;
+	$ProjectID = $ProjectID ?? $_GET["ProjectID"] ?? 0;
+	$src = $src ?? $_GET["src"] ?? "tinyissue";
+	$SkipUser = $SkipUser ?? $_GET["SkipUser"] ?? false;
 	$Type = $Type ?? $_GET["Type"] ?? 'Issue';
-	$UserID = $User ?? $_GET["User"] ?? Auth::user()->id ?? 1;
+	$UserID = $User ?? $_GET["User"] ?? $_GET["UserID"] ?? Auth::user()->id ?? 1;
 
 	if ($Type == 'User') {
 		$resu = Requis("SELECT * FROM users WHERE email = '".$UserID."'");
 	} else {
+		$UserID = $UserID ?? (is_array($User) ? $User[0] : $User);
 		$resu = Requis("SELECT * FROM users WHERE id = ".$UserID);
 	}
 	$QuelUser = Fetche($resu);
@@ -25,31 +33,25 @@
 		$Lng['tinyissue'] = $emailLng;
 		$Lng['email'] = $emailLnE;
 	}
+
 	$optMail = $config["mail"];
-	$ProjectID = $ProjectID ?? 0;
-	$IssueID = $IssueID ?? 0;
+	$url = trim($config["url"]);
 
 	//Titre et corps du message selon les configurations choisies par l'administrateur
-	$message  = (file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $config['mail']['intro']; 
+	$message = "";
 	if (is_array(@$contenu)) {
-		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.$contenu[0].'_tit'];
+		$subject = (file_exists($dir.$contenu[0].'_tit.html')) ? file_get_contents($dir.$contenu[0].'_tit.html') : $Lng[$src[0]]['following_email_'.strtolower($contenu[0]).'_tit'];
 		foreach ($contenu as $ind => $val) {
 			if ($src[$ind] == 'value') {
-				$message .= $val;
+				$message .= '<i>'.$val.'</i>';
 			} else {
-				if (file_exists($dir.$val.'.html')) {
-					$message .= file_get_contents($dir.$val.'.html');
-				} else {
-					$message .= $Lng[$src[$ind]]['following_email_'.$val];
-				}
+				$message .= (file_exists($dir.$val.'.html')) ? file_get_contents($dir.$val.'.html') : $Lng[$src[$ind]]['following_email_'.strtolower($val)];
 			}
 		}
-	} else if ($Type == 'TestonsSVP') {
-		$message .= $Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
 	} else {
-		$message = @$contenu;
+		$message = (@$contenu != 'comment') ? @$contenu : "";
 	}
-	$message .= (file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $config['mail']['bye']; 
+	
 	$subject = $subject ?? 'BUGS';
 
 		//Select email addresses
@@ -60,10 +62,15 @@
 	} else if ($Type == 'TestonsSVP') {
 		$query  = "SELECT DISTINCT 0 AS project, 1 AS attached, 1 AS tages, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, 'Testing mail for any project' AS name, 'Test' AS title ";
 		$query .= "FROM users AS USR WHERE USR.id = ".$UserID;
+		$message .= " ".$Lng['tinyissue']["email_test"].$config['my_bugs_app']['name'].').';
 		$subject = $Lng['tinyissue']["email_test_tit"];
 		echo $Lng['tinyissue']["email_test_tit"];
 	} else {
-		$query  = "SELECT DISTINCT FAL.project, FAL.attached, FAL.tags, USR.email, USR.firstname AS first, USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, PRO.name, TIK.title ";
+		$query  = "SELECT DISTINCT FAL.project, FAL.attached, FAL.tags, ";
+		$query .= "		USR.email, USR.firstname AS first, ";
+		$query .= "		USR.lastname as last, CONCAT(USR.firstname, ' ', USR.lastname) AS user, USR.language, ";
+		$query .= "		PRO.name, ";
+		$query .= "	(SELECT title FROM projects_issues WHERE id = ".@$IssueID.") AS title ";
 		$query .= "FROM following AS FAL ";
 		$query .= "LEFT JOIN users AS USR ON USR.id = FAL.user_id "; 
 		$query .= "LEFT JOIN projects AS PRO ON PRO.id = FAL.project_id ";
@@ -81,7 +88,7 @@
 
 	if (Nombre($followers) > 0) {
 		while ($follower = Fetche($followers)) {
-			$subject = wildcards($subject, $follower,$ProjectID, $IssueID);
+			$subject = wildcards($subject, $follower,$ProjectID, $IssueID, true, $url);
 			$passage_ligne = (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $follower["email"])) ? "\r\n" : "\n";
 			$message = str_replace('"', "``", $message);
 			$message = stripslashes($message);
@@ -101,13 +108,13 @@
 				$body .= '--'.$boundary.''.$passage_ligne;
 				$body .= 'Content-Type: text/html; charset="'.$optMail['encoding'].'"'.$passage_ligne;
 				$body .= $passage_ligne;
-				$body .= '<p>'.$optMail['intro'].'</p>';
+				$body .= '<p>'.((file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $optMail['intro']).'</p>';
 				$body .= $passage_ligne;
 				$body .= '<p>'.$message.'</p>';
 				$body .= $passage_ligne;
-				$body .= '<p>'.$optMail['bye'].'</p>';
+				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
 				$body .= $passage_ligne.'';
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, false, $url);
 				mail($follower["email"], $subject, $body, $headers);
 			} else {
 				$mail = new PHPMailer();
@@ -146,12 +153,12 @@
 				$mail->SetFrom ($optMail['from']['email'], $optMail['from']['name']);
 				$mail->Subject = $subject;
 				$mail->ContentType = $optMail['plainHTML'] ?? 'text/plain';
-				$body  = $optMail['intro'];
+				$body .= '<p>'.((file_exists($dir."intro.html")) ? file_get_contents($dir."intro.html") : $optMail['intro']).'</p>'; 
 				$body .= '<br /><br />';
 				$body .= $message;
 				$body .= '<br /><br />';
-				$body .= $optMail['bye'];
-				$body = wildcards ($body, $follower,$ProjectID, $IssueID);
+				$body .= '<p>'.((file_exists($dir."bye.html")) ? file_get_contents($dir."bye.html") : $optMail['bye']).'</p>'; 
+				$body = wildcards ($body, $follower,$ProjectID, $IssueID, false, $rl);
 				if ($mail->ContentType == 'html') {
 					$mail->IsHTML(true);
 					$mail->WordWrap = (isset($optMail['linelenght'])) ? $optMail['linelenght'] : 80;
@@ -167,14 +174,39 @@
 		}
 	}
 	
-function wildcards ($body, $follower,$ProjectID, $IssueID) {
-	$link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-	$link = substr($link, 0, strrpos($link, "/"));
+	
+function wildcards ($body, $follower,$ProjectID, $IssueID, $tit = false, $url) {
+	$link = ($url != '') ? $url : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http")."://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+	$lfin = $tit ? ' »' : '</a>';
+	//$liss = $tit ? ' « ' : '<a href="'.(str_replace("issue/new", "issue/".$IssueID."/", $link)).'">';
+	//$lpro = $tit ? ' « ' : '<a href="'.substr($link, 0, strpos($link, "issue"))."issues?tag_id=1".'">';
+	$liss = $tit ? ' « ' : '<a href="'.$link."project/".$ProjectID."/issue/".$IssueID."/".'">';
+	$lpro = $tit ? ' « ' : '<a href="'.$link."project/".$ProjectID."/issues?tag_id=1".'">';
+	$body = str_replace('{frst}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firt}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firs}', ucwords($follower["first"]), $body);
 	$body = str_replace('{first}', ucwords($follower["first"]), $body);
+	$body = str_replace('{firsts}', ucwords($follower["first"]), $body);
+	$body = str_replace('{lst}', ucwords($follower["last"]), $body);
+	$body = str_replace('{lat}', ucwords($follower["last"]), $body);
+	$body = str_replace('{las}', ucwords($follower["last"]), $body);
 	$body = str_replace('{last}', ucwords($follower["last"]), $body);
+	$body = str_replace('{lasts}', ucwords($follower["last"]), $body);
+	$body = str_replace('{ful}', ucwords($follower["user"]), $body);
+	$body = str_replace('{fll}', ucwords($follower["user"]), $body);
 	$body = str_replace('{full}', ucwords($follower["user"]), $body);
-	$body = str_replace('{project}', '<a href="'.(str_replace("issue/new", "issues?tag_id=1", $link)).'">'.$follower["name"].'</a>', $body);
-	$body = str_replace('{issue}', '<a href="'.(str_replace("issue/new", "issue/".$IssueID, $link)).'">'.$follower["title"].'</a>', $body);
+	$body = str_replace('{fulls}', ucwords($follower["user"]), $body);
+	$body = str_replace('{pjet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{prjet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projet}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projets}', $lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{prject}', 	$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{project}', $lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{projects}',$lpro.$follower["name"].$lfin, $body);
+	$body = str_replace('{issu}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{isue}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{issue}', 	$liss.$follower["title"].$lfin, $body);
+	$body = str_replace('{issues}',	$liss.$follower["title"].$lfin, $body);
 	return $body;
 }
 ?>
