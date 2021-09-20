@@ -28,7 +28,8 @@
 			</tr>
 
 			<tr>
-				<th><?php echo __('tinyissue.tags'); ?></th>
+				<th><?php echo __('tinyissue.tags'); ?><br /><span style="font-weight: lighter;">Joker : % *</span>
+				</th>
 				<td>
 					<?php echo Form::text('tags', Input::old('tags', $issue_tags), array('id' => 'tags')); ?>
 					<?php echo $errors->first('tags', '<span class="error">:message</span>'); ?>
@@ -41,6 +42,7 @@
 						});
 					});
 					</script>
+					&nbsp;&nbsp;&nbsp;
 				</td>
 			</tr>
 			<tr>
@@ -58,7 +60,7 @@
 			</tr>
 
 			<tr>
-				<th><?php echo __('tinyissue.assigned_to'); ?></th>
+				<th><?php echo __('tinyissue.assigned_to'); ?>&nbsp;&nbsp;</th>
 				<td>
 					<?php echo Form::select('assigned_to', array(0 => '') + Project\User::dropdown($project->users()->get()), Input::old('asigned_to', $issue->assigned_to)); ?>
 				</td>
