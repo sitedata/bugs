@@ -10,9 +10,9 @@
 - Make the /uploads/ sub-directory  `write-able´ ( CHMOD -R  770 )
 - set  www-data  ( CHOWN -R www-data:www-data )  as owner of the Bugs's main directory and sub-directories
 - Open index.php ... it should bring you to ./install/index.php page and open the installation forms
-	( ex.:   http://127.0.0.1/Bugs/index.php  )
-- Create new users
-- Create new project 
+	( ex.:   http://127.0.0.1/Bugs/index.php  ) 
+- Create users
+- Create first project
 
 Enjoy!
 
@@ -125,4 +125,3 @@ various layout tweaks.
 
 - [Alexandre Plennevaux](https://pixeline.be) ... to 2016
 - [Patrick Allaire, ptre](http://cartefoi.net) from 2016 to now
-
